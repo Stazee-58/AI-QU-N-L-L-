@@ -342,6 +342,18 @@ Hỏi: Muốn thêm một nhân viên mới vào xưởng thì làm như thế n
 Đáp: Đăng nhập bằng tài khoản `admin` -> Chọn tab "Quản lý Người dùng" -> Bấm nút "Thêm Người Dùng"
      -> Điền tên, số điện thoại và chọn 1 trong 8 vai trò phù hợp -> Bấm "Tạo tài khoản".
 
+Hỏi: Làm thế nào để reset hệ thống về mới nguyên (xóa sạch dữ liệu để nhập mới từ đầu)?
+Đáp: 
+     Cách 1 (Nhanh nhất - 1 chạm trên giao diện):
+     - Đăng nhập vào hệ thống với tài khoản bất kỳ.
+     - Trên thanh tiêu đề (Header bar) góc trên bên phải, bấm vào nút "Reset Hệ Thống".
+     - Hệ thống hiện hộp thoại xác nhận -> Bấm OK. Toàn bộ lệnh sản xuất, thẻ kho, quyết toán,
+       vật tư và nhật ký đối soát sẽ được làm sạch 100% về 0 (nhưng vẫn giữ nguyên 8 tài khoản đăng nhập).
+     
+     Cách 2 (Qua API):
+     - Gửi yêu cầu POST tới `/api/v1/system/reset` với body `{"mode": "empty"}`.
+     - (Nếu sau này muốn nạp lại bộ dữ liệu mẫu Demo để tập dượt, gửi body `{"mode": "demo"}`).
+
 
 ================================================================================
 THÔNG TIN HỖ TRỢ KỸ THUẬT
@@ -351,3 +363,4 @@ Mã nguồn: https://github.com/Stazee-58/AI-QU-N-L-L-.git
 Nhánh chính thức: master
 Bản quyền: (c) 2026 Cậu Long Enterprise. All rights reserved.
 ================================================================================
+

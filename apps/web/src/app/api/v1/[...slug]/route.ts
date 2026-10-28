@@ -32,23 +32,23 @@ let users = [
   { id: 8, username: 'ketoan', full_name: 'Kế toán trưởng Hoàng Kim Oanh', phone: '0901000007', role_id: 8, is_active: true, role: ROLES[7] }
 ];
 
-// Materials Catalog (FastAPI returns List[MaterialResponse] - Array format)
-let materials = [
+// Demo Materials Catalog
+const DEMO_MATERIALS = [
   { id: 1, code: 'VT-THEP-V50', name: 'Thép góc V50x50x5mm', spec: 'Mạ kẽm nhúng nóng, cây tiêu chuẩn 6m', unit: 'Cây', category: 'Thép kết cấu', standard_price: 245000.0, min_stock_alert: 20.0, current_stock: 58.0 },
   { id: 2, code: 'VT-THEP-HOP50', name: 'Thép hộp 50x100 dày 2mm', spec: 'Thép hộp mạ kẽm Hòa Phát, cây 6m', unit: 'Cây', category: 'Thép kết cấu', standard_price: 380000.0, min_stock_alert: 15.0, current_stock: 34.0 },
   { id: 3, code: 'VT-INOX-304', name: 'Tấm Inox 304 xước dày 1.5mm', spec: 'Khổ 1220x2440mm bọc màng PE', unit: 'Tấm', category: 'Inox', standard_price: 850000.0, min_stock_alert: 5.0, current_stock: 12.0 },
   { id: 4, code: 'VT-SON-EPOXY', name: 'Sơn Epoxy chống gỉ 2 thành phần', spec: 'Thùng 20L màu ghi xám', unit: 'Thùng', category: 'Sơn & Hóa chất', standard_price: 1250000.0, min_stock_alert: 4.0, current_stock: 9.0 }
 ];
 
-// Norms
-const norms = [
+// Demo Norms
+const DEMO_NORMS = [
   { id: 1, product_type: 'Cổng nhôm đúc', component_name: 'Khung viền chính', material_code: 'VT-THEP-V50', quantity_per_unit: 0.5, unit: 'Cây/m2', scrap_rate: 0.05 },
   { id: 2, product_type: 'Khung dầm thép', component_name: 'Dầm giằng ngang', material_code: 'VT-THEP-HOP50', quantity_per_unit: 1.2, unit: 'Cây/bộ', scrap_rate: 0.03 },
   { id: 3, product_type: 'Lan can Inox', component_name: 'Tay vịn & nan đứng', material_code: 'VT-INOX-304', quantity_per_unit: 0.25, unit: 'Tấm/m', scrap_rate: 0.08 }
 ];
 
-// Work Orders (G2)
-let workOrders = [
+// Demo Work Orders (G2)
+const DEMO_WORK_ORDERS = [
   {
     id: 1,
     code: 'LSX-2026-001',
@@ -114,8 +114,8 @@ let workOrders = [
   }
 ];
 
-// Production Logs (G2)
-let productionLogs = [
+// Demo Production Logs (G2)
+const DEMO_PRODUCTION_LOGS = [
   {
     id: 1,
     work_order_id: 1,
@@ -154,8 +154,8 @@ let productionLogs = [
   }
 ];
 
-// Daily Summaries (G2) - Nested 3 versions according to DailySummaryResponse schema
-let dailySummary = {
+// Demo Daily Summaries (G2) - Nested 3 versions according to DailySummaryResponse schema
+const DEMO_DAILY_SUMMARY = {
   shift_date: '2026-10-28',
   generated_at: new Date().toISOString(),
   director_summary: {
@@ -228,8 +228,8 @@ let dailySummary = {
   delayed_orders: []
 };
 
-// Inventory Transactions (G3)
-let inventoryTransactions = [
+// Demo Inventory Transactions (G3)
+const DEMO_INVENTORY_TRANSACTIONS = [
   {
     id: 'TX-001',
     tx_code: 'PNK-2026-001',
@@ -282,8 +282,8 @@ let inventoryTransactions = [
   }
 ];
 
-// Inventory Alerts (G3 - List[InventoryAlertResponse])
-let inventoryAlerts = [
+// Demo Inventory Alerts (G3 - List[InventoryAlertResponse])
+const DEMO_INVENTORY_ALERTS = [
   {
     id: 'ALT-001',
     type: 'TỒN ĐỌNG LÂU',
@@ -357,8 +357,8 @@ let inventoryAlerts = [
   }
 ];
 
-// Purchase Suggestions (G3 - List[PurchaseSuggestionResponse])
-let purchaseSuggestions = [
+// Demo Purchase Suggestions (G3 - List[PurchaseSuggestionResponse])
+const DEMO_PURCHASE_SUGGESTIONS = [
   {
     material_code: 'VT-THEP-V50',
     material_name: 'Thép góc V50x50x5mm',
@@ -399,8 +399,8 @@ let purchaseSuggestions = [
   }
 ];
 
-// Settlements (G5) - Matches ProjectSettlementResponse schema with materials_detail and labor_detail
-let settlements = [
+// Demo Settlements (G5) - Matches ProjectSettlementResponse schema with materials_detail and labor_detail
+const DEMO_SETTLEMENTS = [
   {
     id: 'DA-2026-001',
     project_id: 'DA-2026-001',
@@ -659,8 +659,8 @@ let aiSettings = [
   }
 ];
 
-// AI Audit Logs (Matches AIAuditResponse schema with module_name and cost_usd)
-let aiAuditLogs = [
+// Demo AI Audit Logs (Matches AIAuditResponse schema with module_name and cost_usd)
+const DEMO_AI_AUDIT_LOGS = [
   {
     id: 'AUD-001',
     module_name: 'INVENTORY_OCR',
@@ -707,6 +707,57 @@ let aiAuditLogs = [
     created_at: new Date(Date.now() - 86400000).toISOString()
   }
 ];
+
+// EMPTY STATE FIXTURES
+const EMPTY_DAILY_SUMMARY = {
+  shift_date: '2026-10-28',
+  generated_at: new Date().toISOString(),
+  director_summary: {
+    title: 'BÁO CÁO ĐIỀU HÀNH TỔNG THỂ',
+    kpis: {
+      total_active_orders: 0,
+      delayed_risk_count: 0,
+      today_logs_count: 0,
+      today_units_completed: 0,
+      today_man_hours: 0,
+      estimated_wip_value: 0
+    },
+    critical_alerts: [],
+    waiting_approval: [],
+    one_sentence_takeaway: 'Hệ thống mới nguyên - Chưa có đơn hàng hay phát sinh sản xuất nào.'
+  },
+  tech_summary: {
+    title: 'BẢNG ĐIỀU HÀNH KỸ THUẬT & TIẾN ĐỘ XƯỞNG',
+    stages: {
+      'Cắt': { qty: 0, hours: 0, workers: 0 },
+      'Hàn': { qty: 0, hours: 0, workers: 0 },
+      'Sơn': { qty: 0, hours: 0, workers: 0 },
+      'Lắp ráp': { qty: 0, hours: 0, workers: 0 },
+      'Đóng gói': { qty: 0, hours: 0, workers: 0 }
+    },
+    reported_issues: [],
+    logs_detail: []
+  },
+  sales_summary: {
+    title: 'VIỆC CẦN LÀM DÀNH CHO KINH DOANH',
+    ready_to_dispatch: [],
+    need_customer_call: [],
+    action_count: 0
+  },
+  delayed_orders: []
+};
+
+// RUNTIME STATE (Initialized to Empty / Clean 0 Data)
+let materials: any[] = [];
+let norms: any[] = [];
+let workOrders: any[] = [];
+let productionLogs: any[] = [];
+let dailySummary: any = JSON.parse(JSON.stringify(EMPTY_DAILY_SUMMARY));
+let inventoryTransactions: any[] = [];
+let inventoryAlerts: any[] = [];
+let purchaseSuggestions: any[] = [];
+let settlements: any[] = [];
+let aiAuditLogs: any[] = [];
 
 // ==============================================================================
 // MAIN HANDLER
@@ -817,6 +868,95 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     body = await req.json();
   } catch (e) {
     // Empty body
+  }
+
+  // 0. System Reset (Empty or Demo)
+  if (path === 'system/reset') {
+    const mode = body.mode || 'empty';
+    if (mode === 'demo') {
+      materials = JSON.parse(JSON.stringify(DEMO_MATERIALS));
+      norms = JSON.parse(JSON.stringify(DEMO_NORMS));
+      workOrders = JSON.parse(JSON.stringify(DEMO_WORK_ORDERS));
+      productionLogs = JSON.parse(JSON.stringify(DEMO_PRODUCTION_LOGS));
+      dailySummary = JSON.parse(JSON.stringify(DEMO_DAILY_SUMMARY));
+      inventoryTransactions = JSON.parse(JSON.stringify(DEMO_INVENTORY_TRANSACTIONS));
+      inventoryAlerts = JSON.parse(JSON.stringify(DEMO_INVENTORY_ALERTS));
+      purchaseSuggestions = JSON.parse(JSON.stringify(DEMO_PURCHASE_SUGGESTIONS));
+      settlements = JSON.parse(JSON.stringify(DEMO_SETTLEMENTS));
+      aiAuditLogs = JSON.parse(JSON.stringify(DEMO_AI_AUDIT_LOGS));
+      return NextResponse.json({ message: 'Đã nạp lại bộ dữ liệu mẫu (Demo)' });
+    } else {
+      materials = [];
+      norms = [];
+      workOrders = [];
+      productionLogs = [];
+      dailySummary = JSON.parse(JSON.stringify(EMPTY_DAILY_SUMMARY));
+      inventoryTransactions = [];
+      inventoryAlerts = [];
+      purchaseSuggestions = [];
+      settlements = [];
+      aiAuditLogs = [];
+      return NextResponse.json({ message: 'Đã reset hệ thống về mới nguyên (0 dữ liệu)' });
+    }
+  }
+
+  // 0b. Create Material
+  if (path === 'materials') {
+    const newMaterial = {
+      id: materials.length + 1,
+      code: body.code || `VT-${Date.now()}`,
+      name: body.name || 'Vật tư mới',
+      spec: body.spec || '',
+      unit: body.unit || 'Cái',
+      category: body.category || 'Khác',
+      standard_price: Number(body.standard_price) || 0,
+      min_stock_alert: Number(body.min_stock_alert) || 0,
+      current_stock: Number(body.current_stock) || 0
+    };
+    materials.push(newMaterial);
+    return NextResponse.json(newMaterial, { status: 201 });
+  }
+
+  // 0c. Create Norm
+  if (path === 'norms') {
+    const newNorm = {
+      id: norms.length + 1,
+      product_type: body.product_type || 'Sản phẩm mới',
+      component_name: body.component_name || 'Chi tiết',
+      material_code: body.material_code || '',
+      quantity_per_unit: Number(body.quantity_per_unit) || 1,
+      unit: body.unit || 'Cái',
+      scrap_rate: Number(body.scrap_rate) || 0
+    };
+    norms.push(newNorm);
+    return NextResponse.json(newNorm, { status: 201 });
+  }
+
+  // 0d. Create Work Order
+  if (path === 'production/work-orders') {
+    const newWo = {
+      id: workOrders.length + 1,
+      code: body.code || `LSX-2026-00${workOrders.length + 1}`,
+      project_id: body.project_id || 1,
+      project_code: body.project_code || 'DA-2026-001',
+      project_name: body.project_name || 'Dự án mới',
+      product_name: body.product_name || 'Sản phẩm mới',
+      target_qty: Number(body.target_qty) || 1,
+      completed_qty: Number(body.completed_qty) || 0,
+      unit: body.unit || 'Bộ',
+      start_date: body.start_date || new Date().toISOString().split('T')[0],
+      due_date: body.due_date || new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+      assigned_foreman_id: body.assigned_foreman_id || 5,
+      foreman_name: body.foreman_name || 'Tổ trưởng xưởng',
+      status: body.status || 'IN_PROGRESS',
+      risk_level: body.risk_level || 'NORMAL',
+      risk_reason: body.risk_reason || null,
+      progress_percent: 0,
+      progress_pct: 0,
+      bom_snapshot: body.bom_snapshot || { materials: [] }
+    };
+    workOrders.push(newWo);
+    return NextResponse.json(newWo, { status: 201 });
   }
 
   // 1. Auth login

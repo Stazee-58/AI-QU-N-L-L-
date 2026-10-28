@@ -16,17 +16,17 @@ export default function ExecutiveDashboardView({ token, currentUser, onNavigateT
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
   const [stats, setStats] = useState({
-    totalProjects: 3,
-    activeWorkOrders: 3,
-    criticalWOCount: 1,
-    warningWOCount: 1,
-    totalContractValue: 1250000000,
-    totalGrossProfit: 840000000,
-    avgMarginPct: 67.2,
-    lowStockCount: 2,
-    stagnantCount: 1,
-    aiMonthlySpentUsd: 12.40,
-    aiBudgetUsd: 50.00
+    totalProjects: 0,
+    activeWorkOrders: 0,
+    criticalWOCount: 0,
+    warningWOCount: 0,
+    totalContractValue: 0,
+    totalGrossProfit: 0,
+    avgMarginPct: 0,
+    lowStockCount: 0,
+    stagnantCount: 0,
+    aiMonthlySpentUsd: 0,
+    aiBudgetUsd: 60.00
   });
 
   const [aiSettings, setAiSettings] = useState<any[]>([]);
@@ -40,21 +40,51 @@ export default function ExecutiveDashboardView({ token, currentUser, onNavigateT
   const loadDashboardData = async () => {
     setIsLoading(true);
     try {
-      const [wosRes, aiRes] = await Promise.all([
-        fetch(`${API_BASE}/api/v1/production/work-orders`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API_BASE}/api/v1/ai-settings`, { headers: { Authorization: `Bearer ${token}` } })
+      const [wosRes, aiRes, setRes, altRes, audRes] = await Promise.all([
+        fetch(`${API_BASE}/api/v1/production/work-orders`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => null),
+        fetch(`${API_BASE}/api/v1/ai-settings`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => null),
+        fetch(`${API_BASE}/api/v1/settlements`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => null),
+        fetch(`${API_BASE}/api/v1/inventory/alerts`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => null),
+        fetch(`${API_BASE}/api/v1/ai-audit`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => null)
       ]);
 
-      if (wosRes.ok) {
-        const wos = await wosRes.json();
-        const crits = wos.filter((w: any) => w.risk_level === 'CRITICAL' || w.risk_level === 'WARNING');
-        setCriticalWorkOrders(crits);
-      }
+      const wos = wosRes && wosRes.ok ? await wosRes.json() : [];
+      const safeWos = Array.isArray(wos) ? wos : [];
+      const crits = safeWos.filter((w: any) => w.risk_level === 'CRITICAL' || w.risk_level === 'WARNING');
+      setCriticalWorkOrders(crits);
 
-      if (aiRes.ok) {
-        const aiList = await aiRes.json();
-        setAiSettings(aiList);
-      }
+      const aiList = aiRes && aiRes.ok ? await aiRes.json() : [];
+      const safeAiList = Array.isArray(aiList) ? aiList : [];
+      setAiSettings(safeAiList);
+
+      const sets = setRes && setRes.ok ? await setRes.json() : [];
+      const safeSets = Array.isArray(sets) ? sets : [];
+
+      const alts = altRes && altRes.ok ? await altRes.json() : [];
+      const safeAlts = Array.isArray(alts) ? alts : [];
+
+      const auds = audRes && audRes.ok ? await audRes.json() : [];
+      const safeAuds = Array.isArray(auds) ? auds : [];
+
+      const totalVal = safeSets.reduce((sum: number, s: any) => sum + (Number(s.contract_value) || 0), 0);
+      const totalProfit = safeSets.reduce((sum: number, s: any) => sum + (Number(s.gross_profit) || 0), 0);
+      const avgMargin = totalVal > 0 ? (totalProfit / totalVal) * 100 : 0;
+      const spentUsd = safeAuds.reduce((sum: number, a: any) => sum + (Number(a.cost_usd) || 0), 0);
+      const totalBudget = safeAiList.reduce((sum: number, s: any) => sum + (Number(s.monthly_budget_usd) || 0), 0) || 60;
+
+      setStats({
+        totalProjects: safeSets.length,
+        activeWorkOrders: safeWos.length,
+        criticalWOCount: safeWos.filter((w: any) => w.risk_level === 'CRITICAL').length,
+        warningWOCount: safeWos.filter((w: any) => w.risk_level === 'WARNING').length,
+        totalContractValue: totalVal,
+        totalGrossProfit: totalProfit,
+        avgMarginPct: parseFloat(avgMargin.toFixed(1)),
+        lowStockCount: safeAlts.filter((a: any) => a.severity === 'CRITICAL').length,
+        stagnantCount: safeAlts.filter((a: any) => a.severity === 'WARNING').length,
+        aiMonthlySpentUsd: parseFloat(spentUsd.toFixed(3)),
+        aiBudgetUsd: totalBudget
+      });
     } catch (err) {
       console.error(err);
     } finally {

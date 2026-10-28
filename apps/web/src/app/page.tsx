@@ -271,6 +271,28 @@ export default function AppHome() {
     }
   };
 
+  const handleSystemReset = async () => {
+    if (!confirm('CẢNH BÁO: Bạn có chắc chắn muốn RESET toàn bộ hệ thống về MỚI NGUYÊN (0 dữ liệu)? Thao tác này sẽ xóa sạch dữ liệu sản xuất, kho, quyết toán và nhật ký đối soát.')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/system/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ mode: 'empty' })
+      });
+      if (res.ok) {
+        alert('Đã reset toàn bộ hệ thống về mới nguyên thành công!');
+        window.location.reload();
+      } else {
+        alert('Không thể reset hệ thống.');
+      }
+    } catch (err) {
+      alert('Lỗi kết nối khi reset hệ thống.');
+    }
+  };
+
   const formatVND = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
@@ -380,6 +402,15 @@ export default function AppHome() {
 
           <button className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.75rem' }} onClick={() => setIsHelpOpen(true)}>
             <HelpCircle size={15} /> <b>?</b> Hướng dẫn
+          </button>
+
+          <button 
+            onClick={handleSystemReset} 
+            className="btn-secondary" 
+            style={{ padding: '6px 12px', fontSize: '0.75rem', color: 'var(--negative)', borderColor: 'var(--border)' }} 
+            title="Reset toàn bộ hệ thống về mới nguyên (0 dữ liệu)"
+          >
+            <RefreshCw size={14} /> Reset Hệ Thống
           </button>
 
           <button onClick={handleLogout} className="btn-secondary" style={{ padding: '6px 10px', color: 'var(--negative)' }} title="Đăng xuất">
@@ -493,10 +524,19 @@ export default function AppHome() {
               </div>
 
               {/* Work Order Cards Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
-                {workOrders
-                  .filter(wo => !riskFilter || wo.risk_level === riskFilter)
-                  .map((wo) => {
+              {workOrders.length === 0 ? (
+                <div className="card" style={{ padding: '48px 24px', textAlign: 'center', background: 'var(--raised)', border: '1px solid var(--border)' }}>
+                  <BarChart3 size={40} style={{ color: 'var(--muted)', margin: '0 auto 12px' }} />
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Hệ thống mới nguyên — Chưa có Lệnh sản xuất</h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '6px', maxWidth: '480px', margin: '6px auto 0' }}>
+                    Chưa có lệnh sản xuất nào được khởi tạo. Bạn có thể sử dụng các chức năng theo vai để tạo lệnh sản xuất mới.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+                  {workOrders
+                    .filter(wo => !riskFilter || wo.risk_level === riskFilter)
+                    .map((wo) => {
                     const isCritical = wo.risk_level === 'CRITICAL';
                     const isWarning = wo.risk_level === 'WARNING';
                     return (
@@ -564,7 +604,8 @@ export default function AppHome() {
                       </div>
                     );
                   })}
-              </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -652,22 +693,30 @@ export default function AppHome() {
                           <h4 style={{ color: 'var(--negative)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <AlertTriangle size={18} /> Cảnh báo rủi ro nghiêm trọng:
                           </h4>
-                          <ul style={{ paddingLeft: '18px', color: 'var(--text-main)', fontSize: '0.85rem', lineHeight: '1.8' }}>
-                            {(dailySummary.director_summary?.critical_alerts || []).map((al: string, i: number) => (
-                              <li key={i}>{al}</li>
-                            ))}
-                          </ul>
+                          {(dailySummary.director_summary?.critical_alerts || []).length === 0 ? (
+                            <p style={{ color: 'var(--muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>Không có cảnh báo rủi ro phát sinh.</p>
+                          ) : (
+                            <ul style={{ paddingLeft: '18px', color: 'var(--text-main)', fontSize: '0.85rem', lineHeight: '1.8' }}>
+                              {(dailySummary.director_summary?.critical_alerts || []).map((al: string, i: number) => (
+                                <li key={i}>{al}</li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
 
                         <div className="card-glass" style={{ padding: '22px' }}>
                           <h4 style={{ color: 'var(--warning)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <CheckCircle2 size={18} /> Mục chờ Giám đốc duyệt nhanh:
                           </h4>
-                          <ul style={{ paddingLeft: '18px', color: 'var(--text-main)', fontSize: '0.85rem', lineHeight: '1.8' }}>
-                            {(dailySummary.director_summary?.waiting_approval || []).map((wa: string, i: number) => (
-                              <li key={i}>{wa}</li>
-                            ))}
-                          </ul>
+                          {(dailySummary.director_summary?.waiting_approval || []).length === 0 ? (
+                            <p style={{ color: 'var(--muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>Không có đề xuất nào đang chờ duyệt.</p>
+                          ) : (
+                            <ul style={{ paddingLeft: '18px', color: 'var(--text-main)', fontSize: '0.85rem', lineHeight: '1.8' }}>
+                              {(dailySummary.director_summary?.waiting_approval || []).map((wa: string, i: number) => (
+                                <li key={i}>{wa}</li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -738,15 +787,23 @@ export default function AppHome() {
                               </tr>
                             </thead>
                             <tbody>
-                              {(dailySummary.sales_summary?.ready_to_dispatch || []).map((item: any, i: number) => (
-                                <tr key={i}>
-                                  <td style={{ fontWeight: 700 }}>{item.customer}</td>
-                                  <td style={{ color: 'var(--accent)' }}>{item.phone}</td>
-                                  <td>{item.product}</td>
-                                  <td><span className="badge badge-green">{item.progress}</span></td>
-                                  <td style={{ color: 'var(--positive)', fontWeight: 600 }}>{item.action}</td>
+                              {(dailySummary.sales_summary?.ready_to_dispatch || []).length === 0 ? (
+                                <tr>
+                                  <td colSpan={5} style={{ textAlign: 'center', color: 'var(--muted)', padding: '16px', fontSize: '0.8rem' }}>
+                                    Chưa có đơn hàng nào cần điều phối giao nhận hôm nay.
+                                  </td>
                                 </tr>
-                              ))}
+                              ) : (
+                                (dailySummary.sales_summary?.ready_to_dispatch || []).map((item: any, i: number) => (
+                                  <tr key={i}>
+                                    <td style={{ fontWeight: 700 }}>{item.customer}</td>
+                                    <td style={{ color: 'var(--accent)' }}>{item.phone}</td>
+                                    <td>{item.product}</td>
+                                    <td><span className="badge badge-green">{item.progress}</span></td>
+                                    <td style={{ color: 'var(--positive)', fontWeight: 600 }}>{item.action}</td>
+                                  </tr>
+                                ))
+                              )}
                             </tbody>
                           </table>
                         </div>
@@ -769,15 +826,23 @@ export default function AppHome() {
                               </tr>
                             </thead>
                             <tbody>
-                              {(dailySummary.sales_summary?.need_customer_call || []).map((item: any, i: number) => (
-                                <tr key={i}>
-                                  <td style={{ fontWeight: 700 }}>{item.customer}</td>
-                                  <td style={{ color: 'var(--accent)' }}>{item.phone}</td>
-                                  <td>{item.product}</td>
-                                  <td style={{ color: 'var(--negative)' }}>{item.reason}</td>
-                                  <td style={{ color: 'var(--warning)', fontWeight: 600 }}>{item.action}</td>
+                              {(dailySummary.sales_summary?.need_customer_call || []).length === 0 ? (
+                                <tr>
+                                  <td colSpan={5} style={{ textAlign: 'center', color: 'var(--muted)', padding: '16px', fontSize: '0.8rem' }}>
+                                    Không có đơn hàng nào bị vướng cần gọi điện hỗ trợ khách hàng.
+                                  </td>
                                 </tr>
-                              ))}
+                              ) : (
+                                (dailySummary.sales_summary?.need_customer_call || []).map((item: any, i: number) => (
+                                  <tr key={i}>
+                                    <td style={{ fontWeight: 700 }}>{item.customer}</td>
+                                    <td style={{ color: 'var(--accent)' }}>{item.phone}</td>
+                                    <td>{item.product}</td>
+                                    <td style={{ color: 'var(--negative)' }}>{item.reason}</td>
+                                    <td style={{ color: 'var(--warning)', fontWeight: 600 }}>{item.action}</td>
+                                  </tr>
+                                ))
+                              )}
                             </tbody>
                           </table>
                         </div>
@@ -876,27 +941,35 @@ export default function AppHome() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(Array.isArray(materials) ? materials : []).filter(m => (m.code || '').toLowerCase().includes(materialSearch.toLowerCase()) || (m.name || '').toLowerCase().includes(materialSearch.toLowerCase())).map((m) => (
-                      <tr key={m.id}>
-                        <td style={{ fontWeight: 700, color: 'var(--accent)' }}>{m.code}</td>
-                        <td style={{ fontWeight: 600 }}>{m.name}</td>
-                        <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{m.spec || '-'}</td>
-                        <td><span className="badge badge-blue">{m.unit}</span></td>
-                        <td>{m.category}</td>
-                        <td style={{ fontWeight: 700, color: 'var(--positive)' }}>{formatVND(m.standard_price)}</td>
-                        <td style={{ color: 'var(--text-dim)' }}>{m.min_stock_alert}</td>
-                        <td>
-                          <span className={m.current_stock < m.min_stock_alert ? 'badge badge-red' : 'badge badge-green'}>
-                            {m.current_stock} {m.unit}
-                          </span>
-                        </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <button className="btn-secondary" style={{ padding: '6px 10px', fontSize: '0.75rem' }} onClick={() => setEditingMaterial(m)}>
-                            <Edit3 size={14} /> Sửa
-                          </button>
+                    {(Array.isArray(materials) ? materials : []).length === 0 ? (
+                      <tr>
+                        <td colSpan={9} style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--muted)', fontSize: '0.85rem' }}>
+                          Chưa có vật tư nào trong danh mục. Bấm "Nhập Excel / CSV" để tải lên danh mục mới.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      (Array.isArray(materials) ? materials : []).filter(m => (m.code || '').toLowerCase().includes(materialSearch.toLowerCase()) || (m.name || '').toLowerCase().includes(materialSearch.toLowerCase())).map((m) => (
+                        <tr key={m.id}>
+                          <td style={{ fontWeight: 700, color: 'var(--accent)' }}>{m.code}</td>
+                          <td style={{ fontWeight: 600 }}>{m.name}</td>
+                          <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{m.spec || '-'}</td>
+                          <td><span className="badge badge-blue">{m.unit}</span></td>
+                          <td>{m.category}</td>
+                          <td style={{ fontWeight: 700, color: 'var(--positive)' }}>{formatVND(m.standard_price)}</td>
+                          <td style={{ color: 'var(--text-dim)' }}>{m.min_stock_alert}</td>
+                          <td>
+                            <span className={m.current_stock < m.min_stock_alert ? 'badge badge-red' : 'badge badge-green'}>
+                              {m.current_stock} {m.unit}
+                            </span>
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <button className="btn-secondary" style={{ padding: '6px 10px', fontSize: '0.75rem' }} onClick={() => setEditingMaterial(m)}>
+                              <Edit3 size={14} /> Sửa
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -911,20 +984,30 @@ export default function AppHome() {
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Cơ sở bóc tách tự động và tính giá trị lệnh sản xuất</p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-                {norms.map((norm) => (
-                  <div key={norm.id} className="card-glass" style={{ padding: '24px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                      <span className="badge badge-blue">{norm.product_type}</span>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Phiên bản {norm.version}</span>
+              {norms.length === 0 ? (
+                <div className="card" style={{ padding: '48px 24px', textAlign: 'center', background: 'var(--raised)', border: '1px solid var(--border)' }}>
+                  <Package size={40} style={{ color: 'var(--muted)', margin: '0 auto 12px' }} />
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Hệ thống mới nguyên — Chưa có Định mức BOM</h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '6px', maxWidth: '480px', margin: '6px auto 0' }}>
+                    Chưa có định mức tiêu hao sản xuất nào. Bạn có thể cấu hình định mức mới theo từng dòng sản phẩm.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+                  {norms.map((norm) => (
+                    <div key={norm.id} className="card-glass" style={{ padding: '24px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                        <span className="badge badge-blue">{norm.product_type}</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Phiên bản {norm.version}</span>
+                      </div>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '8px' }}>{norm.name}</h3>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
+                        Đơn vị tính: <b>{norm.unit}</b> | Giờ công định mức: <b>{norm.labor_hours_per_unit} giờ</b>
+                      </p>
                     </div>
-                    <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '8px' }}>{norm.name}</h3>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
-                      Đơn vị tính: <b>{norm.unit}</b> | Giờ công định mức: <b>{norm.labor_hours_per_unit} giờ</b>
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -1008,28 +1091,36 @@ export default function AppHome() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(Array.isArray(auditLogs) ? auditLogs : []).map((log) => (
-                      <tr key={log.id}>
-                        <td style={{ fontWeight: 600, color: 'var(--accent)' }}>{log.module_name || log.feature_key || 'AI_MODULE'}</td>
-                        <td>{log.user_id || 'system'}</td>
-                        <td>
-                          <span className={(log.confidence_score ?? 1) >= 0.9 ? 'badge badge-green' : 'badge badge-amber'}>
-                            {((log.confidence_score ?? 1) * 100).toFixed(0)}%
-                          </span>
-                        </td>
-                        <td>
-                          {log.is_modified ? (
-                            <span className="badge badge-amber">Có sửa đổi</span>
-                          ) : (
-                            <span className="badge badge-green">Giữ nguyên AI</span>
-                          )}
-                        </td>
-                        <td style={{ color: 'var(--positive)', fontWeight: 600 }}>${(log.cost_usd || 0).toFixed(4)}</td>
-                        <td style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>
-                          {log.created_at ? new Date(log.created_at).toLocaleString('vi-VN') : ''}
+                    {(Array.isArray(auditLogs) ? auditLogs : []).length === 0 ? (
+                      <tr>
+                        <td colSpan={6} style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--muted)', fontSize: '0.85rem' }}>
+                          Chưa có nhật ký đối soát AI nào được ghi nhận.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      (Array.isArray(auditLogs) ? auditLogs : []).map((log) => (
+                        <tr key={log.id}>
+                          <td style={{ fontWeight: 600, color: 'var(--accent)' }}>{log.module_name || log.feature_key || 'AI_MODULE'}</td>
+                          <td>{log.user_id || 'system'}</td>
+                          <td>
+                            <span className={(log.confidence_score ?? 1) >= 0.9 ? 'badge badge-green' : 'badge badge-amber'}>
+                              {((log.confidence_score ?? 1) * 100).toFixed(0)}%
+                            </span>
+                          </td>
+                          <td>
+                            {log.is_modified ? (
+                              <span className="badge badge-amber">Có sửa đổi</span>
+                            ) : (
+                              <span className="badge badge-green">Giữ nguyên AI</span>
+                            )}
+                          </td>
+                          <td style={{ color: 'var(--positive)', fontWeight: 600 }}>${(log.cost_usd || 0).toFixed(4)}</td>
+                          <td style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>
+                            {log.created_at ? new Date(log.created_at).toLocaleString('vi-VN') : ''}
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -149,43 +149,56 @@ export default function SettlementView({ token, currentUser }: SettlementViewPro
       </div>
 
       {/* Tabs chọn Dự án */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '4px' }}>
-        {settlements.map((s) => {
-          const isSelected = s.project_id === selectedProjectId;
-          const isFinal = s.status === 'FINALIZED';
+      {settlements.length > 0 && (
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '4px' }}>
+          {settlements.map((s) => {
+            const isSelected = s.project_id === selectedProjectId;
+            const isFinal = s.status === 'FINALIZED';
 
-          return (
-            <div
-              key={s.project_id}
-              onClick={() => handleSelectProject(s.project_id)}
-              style={{
-                background: isSelected ? 'var(--surface)' : 'var(--raised)',
-                border: isSelected ? '2px solid var(--accent)' : '1px solid var(--border)',
-                borderRadius: 'var(--radius-card)',
-                padding: '12px 16px',
-                cursor: 'pointer',
-                minWidth: '220px',
-                transition: 'all 0.15s ease'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                <span style={{ fontWeight: 700, fontSize: '0.8rem', color: isSelected ? 'var(--accent)' : 'var(--text)' }}>
-                  {s.project_code || s.project_id}
-                </span>
-                <span className={isFinal ? 'pill pos' : 'pill warn'} style={{ fontSize: '0.65rem' }}>
-                  {isFinal ? 'ĐÃ KHÓA SỔ' : 'DỰ THẢO'}
-                </span>
+            return (
+              <div
+                key={s.project_id}
+                onClick={() => handleSelectProject(s.project_id)}
+                style={{
+                  background: isSelected ? 'var(--surface)' : 'var(--raised)',
+                  border: isSelected ? '2px solid var(--accent)' : '1px solid var(--border)',
+                  borderRadius: 'var(--radius-card)',
+                  padding: '12px 16px',
+                  cursor: 'pointer',
+                  minWidth: '220px',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <span style={{ fontWeight: 700, fontSize: '0.8rem', color: isSelected ? 'var(--accent)' : 'var(--text)' }}>
+                    {s.project_code || s.project_id}
+                  </span>
+                  <span className={isFinal ? 'pill pos' : 'pill warn'} style={{ fontSize: '0.65rem' }}>
+                    {isFinal ? 'ĐÃ KHÓA SỔ' : 'DỰ THẢO'}
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {s.project_name}
+                </p>
+                <p style={{ fontSize: '0.7rem', color: 'var(--muted)', marginTop: '2px' }}>
+                  Khách: {s.customer_name}
+                </p>
               </div>
-              <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {s.project_name}
-              </p>
-              <p style={{ fontSize: '0.7rem', color: 'var(--muted)', marginTop: '2px' }}>
-                Khách: {s.customer_name}
-              </p>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Empty State Banner khi chưa có dự án quyết toán */}
+      {settlements.length === 0 && !isLoading && (
+        <div className="card" style={{ padding: '48px 24px', textAlign: 'center', background: 'var(--raised)', border: '1px solid var(--border)' }}>
+          <FileCheck2 size={40} style={{ color: 'var(--muted)', margin: '0 auto 12px' }} />
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Hệ thống mới nguyên — Chưa có dự án quyết toán</h3>
+          <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '6px', maxWidth: '480px', margin: '6px auto 0' }}>
+            Toàn bộ số liệu đã được làm sạch. Khi có Lệnh sản xuất hoàn tất nghiệm thu, bảng đối soát chi phí vật tư, nhân công và lãi gộp sẽ được tổng hợp tự động tại đây.
+          </p>
+        </div>
+      )}
 
       {currentSettlement && (
         <div>
