@@ -40,10 +40,19 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
   // Evidence modal for 'Xem nguồn'
   const [activeEvidence, setActiveEvidence] = useState<any | null>(null);
 
+  // Default catalog fallback
+  const defaultCatalog = [
+    { code: 'VT-THEP-V50', name: 'Thép góc V50x50x5mm', unit: 'Cây', standard_price: 245000 },
+    { code: 'VT-THEP-HOP50', name: 'Thép hộp 50x100 dày 2mm', unit: 'Cây', standard_price: 380000 },
+    { code: 'VT-INOX-304', name: 'Tấm Inox 304 xước dày 1.5mm', unit: 'Tấm', standard_price: 850000 },
+    { code: 'VT-SON-EPOXY', name: 'Sơn Epoxy chống gỉ 2 thành phần', unit: 'Thùng', standard_price: 1250000 }
+  ];
+  const catalog = (Array.isArray(materialsCatalog) && materialsCatalog.length > 0) ? materialsCatalog : defaultCatalog;
+
   // Manual Form State
   const [manualForm, setManualForm] = useState({
     tx_type: 'IN',
-    material_code: materialsCatalog[0]?.code || 'VT-THEP-V50',
+    material_code: (materialsCatalog && materialsCatalog[0]?.code) || 'VT-THEP-V50',
     quantity: 10,
     unit_price: 245000,
     partner_name: 'Đại lý Kim khí Hà Nội',
@@ -52,6 +61,11 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
     notes: 'Nhập tay theo thủ tục kho'
   });
   const [isSubmittingManual, setIsSubmittingManual] = useState(false);
+
+  // Safe arrays for defensive rendering
+  const safeAlerts: any[] = Array.isArray(alerts) ? alerts : ((alerts as any)?.alerts || []);
+  const safeSuggestions: any[] = Array.isArray(suggestions) ? suggestions : ((suggestions as any)?.suggestions || []);
+  const safeTransactions: any[] = Array.isArray(transactions) ? transactions : ((transactions as any)?.transactions || []);
 
   // Real-world Presets for Warehouse Staff (Thao tác 1: chọn là xong)
   const PRESET_RECEIPTS = [
@@ -116,8 +130,14 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
         fetch(`${API_BASE}/api/v1/inventory/alerts`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API_BASE}/api/v1/inventory/purchase-suggestions`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
-      if (resAlerts.ok) setAlerts(await resAlerts.json());
-      if (resSugs.ok) setSuggestions(await resSugs.json());
+      if (resAlerts.ok) {
+        const rawAlerts = await resAlerts.json();
+        setAlerts(Array.isArray(rawAlerts) ? rawAlerts : (rawAlerts?.alerts || []));
+      }
+      if (resSugs.ok) {
+        const rawSugs = await resSugs.json();
+        setSuggestions(Array.isArray(rawSugs) ? rawSugs : (rawSugs?.suggestions || []));
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -130,7 +150,10 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
       const res = await fetch(`${API_BASE}/api/v1/inventory/transactions?limit=25`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) setTransactions(await res.json());
+      if (res.ok) {
+        const rawTxs = await res.json();
+        setTransactions(Array.isArray(rawTxs) ? rawTxs : (rawTxs?.transactions || []));
+      }
     } catch (err) {
       console.error(err);
     }
@@ -207,23 +230,23 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
 
     try {
       const payload = {
-        receipt_no: parsedReceipt.receipt_no,
-        receipt_type: parsedReceipt.receipt_type,
-        partner_name: parsedReceipt.partner_name,
-        project_id: parsedReceipt.project_code || 'DA-2026-001',
-        work_order_id: parsedReceipt.work_order_code,
-        purchase_order_id: parsedReceipt.po_code,
+        receipt_no: parsedReceipt.receipt_no || parsedReceipt.receipt_number || 'PNK-G3',
+        receipt_type: parsedReceipt.receipt_type || 'IN',
+        partner_name: parsedReceipt.partner_name || parsedReceipt.vendor_name || 'Nội bộ',
+        project_id: parsedReceipt.project_code || parsedReceipt.suggested_project_code || 'DA-2026-001',
+        work_order_id: parsedReceipt.work_order_code || '',
+        purchase_order_id: parsedReceipt.po_code || '',
         receipt_image_path: '/uploads/receipts/sample_slip.jpg',
-        ocr_raw_text: parsedReceipt.raw_ocr_text,
-        ai_confidence: parsedReceipt.overall_confidence,
-        items: parsedReceipt.items.map((it: any) => ({
+        ocr_raw_text: parsedReceipt.raw_ocr_text || '',
+        ai_confidence: parsedReceipt.overall_confidence || parsedReceipt.ocr_confidence_score || 0.95,
+        items: (parsedReceipt.items || []).map((it: any) => ({
           material_code: it.material_code,
           quantity: it.quantity,
           unit_price: it.unit_price,
           confidence_by_field: {
-            quantity: it.confidence_quantity,
-            unit_price: it.confidence_price,
-            material_code: it.confidence_material_code
+            quantity: it.confidence_quantity || it.confidence_qty || 0.95,
+            unit_price: it.confidence_price || 0.95,
+            material_code: it.confidence_material_code || 0.95
           },
           notes: it.flag_reason
         }))
@@ -244,7 +267,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
       }
 
       const result = await res.json();
-      setCreatedTxResult(result);
+      setCreatedTxResult(Array.isArray(result) ? result : [result]);
       setOcrStep('SUCCESS');
       loadTransactions();
       loadAlertsAndSuggestions();
@@ -360,7 +383,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
             className={activeSubTab === 'alerts_suggestions' ? 'btn-primary' : 'btn-secondary'}
             style={{ fontSize: '0.75rem', padding: '6px 14px', border: 'none', background: activeSubTab === 'alerts_suggestions' ? undefined : 'transparent' }}
           >
-            <ShieldAlert size={14} /> Cảnh báo & Mua hàng ({alerts.length})
+            <ShieldAlert size={14} /> Cảnh báo & Mua hàng ({safeAlerts.length})
           </button>
           <button
             onClick={() => setActiveSubTab('transactions_log')}
@@ -374,14 +397,14 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
 
       {/* 4 Cảnh báo Kho tóm tắt trên đầu (Quick Alerts Strip) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginBottom: '20px' }}>
-        {alerts.slice(0, 4).map((alt) => {
-          const isCritical = alt.severity === 'CRITICAL';
-          const isWarning = alt.severity === 'WARNING';
+        {safeAlerts.slice(0, 4).map((alt: any, idx: number) => {
+          const isCritical = alt?.severity === 'CRITICAL';
+          const isWarning = alt?.severity === 'WARNING';
           const pillClass = isCritical ? 'pill neg' : isWarning ? 'pill warn' : 'pill neutral';
 
           return (
             <div 
-              key={alt.id}
+              key={alt?.id || `alt-strip-${idx}`}
               className="card"
               style={{ 
                 padding: '12px 14px', 
@@ -394,7 +417,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
             >
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                  <span className={pillClass} style={{ fontSize: '0.65rem' }}>{alt.type}</span>
+                  <span className={pillClass} style={{ fontSize: '0.65rem' }}>{alt?.type || alt?.alert_type || 'CẢNH BÁO'}</span>
                   <button 
                     onClick={() => setActiveEvidence(alt)}
                     className="btn-secondary"
@@ -404,10 +427,10 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                     <Eye size={12} /> Xem nguồn
                   </button>
                 </div>
-                <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text)' }}>{alt.title}</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '2px', lineHeight: 1.3 }}>{alt.description}</p>
+                <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text)' }}>{alt?.title || alt?.material_name || 'Cảnh báo kho'}</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '2px', lineHeight: 1.3 }}>{alt?.description || alt?.message || ''}</p>
               </div>
-              <p style={{ fontSize: '0.7rem', color: 'var(--faint)' }}>Nguồn: {alt.source_ref}</p>
+              <p style={{ fontSize: '0.7rem', color: 'var(--faint)' }}>Nguồn: {alt?.source_ref || 'Hệ thống kho'}</p>
             </div>
           );
         })}
@@ -624,9 +647,9 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                         <span style={{ textAlign: 'right' }}>Đơn giá</span>
                         <span style={{ textAlign: 'right' }}>T.Tiền</span>
                       </div>
-                      {parsedReceipt.items.map((it: any, idx: number) => {
-                        const isSuspiciousPrice = it.confidence_price < 0.70;
-                        const isSuspiciousQty = it.confidence_quantity < 0.90;
+                      {(parsedReceipt.items || []).map((it: any, idx: number) => {
+                        const isSuspiciousPrice = (it.confidence_price || 1) < 0.70;
+                        const isSuspiciousQty = (it.confidence_quantity || 1) < 0.90;
 
                         return (
                           <div key={idx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', padding: '4px', borderBottom: '1px dashed #cbd5e1' }}>
@@ -635,10 +658,10 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                               {it.quantity} {it.unit}
                             </span>
                             <span style={{ textAlign: 'right', background: isSuspiciousPrice ? '#fecaca' : 'transparent', fontWeight: isSuspiciousPrice ? 700 : 400 }}>
-                              {it.unit_price.toLocaleString('vi-VN')}
+                              {Number(it.unit_price || 0).toLocaleString('vi-VN')}
                             </span>
                             <span style={{ textAlign: 'right' }}>
-                              {it.total_amount.toLocaleString('vi-VN')}
+                              {Number(it.total_amount || 0).toLocaleString('vi-VN')}
                             </span>
                           </div>
                         );
@@ -647,7 +670,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
 
                     {/* Tổng tiền */}
                     <div style={{ textAlign: 'right', fontWeight: 800, fontSize: '0.85rem' }}>
-                      Tổng cộng: {parsedReceipt.total_value.toLocaleString('vi-VN')} VNĐ
+                      Tổng cộng: {Number(parsedReceipt.total_value ?? parsedReceipt.total_amount ?? 0).toLocaleString('vi-VN')} VNĐ
                     </div>
 
                     {/* Dấu mộc / chữ ký */}
@@ -757,10 +780,10 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                         </tr>
                       </thead>
                       <tbody>
-                        {parsedReceipt.items.map((it: any, idx: number) => {
-                          const qtyClass = getCellHighlightClass(it.confidence_quantity);
-                          const priceClass = getCellHighlightClass(it.confidence_price);
-                          const codeClass = getCellHighlightClass(it.confidence_material_code);
+                        {(parsedReceipt.items || []).map((it: any, idx: number) => {
+                          const qtyClass = getCellHighlightClass(it.confidence_quantity || 1);
+                          const priceClass = getCellHighlightClass(it.confidence_price || 1);
+                          const codeClass = getCellHighlightClass(it.confidence_material_code || 1);
 
                           return (
                             <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
@@ -772,7 +795,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                                   className={codeClass}
                                   style={{ width: '100%', padding: '4px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}
                                 >
-                                  {materialsCatalog.map((m) => (
+                                  {catalog.map((m: any) => (
                                     <option key={m.code} value={m.code}>
                                       {m.code} - {m.name}
                                     </option>
@@ -793,7 +816,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                                   style={{ width: '100%', padding: '4px 6px', borderRadius: '4px', textAlign: 'right', fontWeight: 600 }}
                                 />
                                 <span style={{ fontSize: '0.65rem', color: 'var(--faint)', display: 'block', textAlign: 'right' }}>
-                                  ĐVT: {it.unit} ({(it.confidence_quantity * 100).toFixed(0)}%)
+                                  ĐVT: {it.unit} ({((it.confidence_quantity || 0.95) * 100).toFixed(0)}%)
                                 </span>
                               </td>
 
@@ -807,13 +830,13 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                                   style={{ width: '100%', padding: '4px 6px', borderRadius: '4px', textAlign: 'right', fontWeight: 700 }}
                                 />
                                 <span style={{ fontSize: '0.65rem', color: 'var(--faint)', display: 'block', textAlign: 'right' }}>
-                                  Tin cậy: ({(it.confidence_price * 100).toFixed(0)}%)
+                                  Tin cậy: ({((it.confidence_price || 0.95) * 100).toFixed(0)}%)
                                 </span>
-                                {it.confidence_price < 0.70 && (
+                                {(it.confidence_price || 1) < 0.70 && (
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      const mat = materialsCatalog.find(m => m.code === it.material_code);
+                                      const mat = catalog.find(m => m.code === it.material_code);
                                       const std = mat ? parseFloat(mat.standard_price) : 245000;
                                       handleUpdateItemField(idx, 'unit_price', std);
                                       it.confidence_price = 0.95;
@@ -834,14 +857,14 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                                     }}
                                     title="Sửa lỗi nhanh cho thủ kho mới: Bấm 1 chạm để áp giá chuẩn"
                                   >
-                                    Áp giá chuẩn ({materialsCatalog.find(m => m.code === it.material_code)?.standard_price ? Number(materialsCatalog.find(m => m.code === it.material_code)?.standard_price).toLocaleString('vi-VN') : '245,000'}đ)
+                                    Áp giá chuẩn ({catalog.find(m => m.code === it.material_code)?.standard_price ? Number(catalog.find(m => m.code === it.material_code)?.standard_price).toLocaleString('vi-VN') : '245,000'}đ)
                                   </button>
                                 )}
                               </td>
 
                               {/* Cột 4: Thành tiền */}
                               <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700 }}>
-                                {it.total_amount.toLocaleString('vi-VN')}
+                                {Number(it.total_amount || 0).toLocaleString('vi-VN')}
                               </td>
 
                               {/* Cột 5: Ghi chú cảnh báo */}
@@ -851,7 +874,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '4px',
-                                    color: it.confidence_price < 0.70 ? 'var(--negative)' : 'var(--warning)',
+                                    color: (it.confidence_price || 1) < 0.70 ? 'var(--negative)' : 'var(--warning)',
                                     fontSize: '0.7rem',
                                     fontWeight: 600
                                   }}>
@@ -883,7 +906,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                     <div>
                       <p style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>Tổng giá trị phiếu:</p>
                       <p style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text)' }}>
-                        {parsedReceipt.total_value.toLocaleString('vi-VN')} VNĐ
+                        {Number(parsedReceipt.total_value ?? parsedReceipt.total_amount ?? 0).toLocaleString('vi-VN')} VNĐ
                       </p>
                     </div>
 
@@ -933,7 +956,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                 Đã ghi nhận Phiếu Kho Thành Công!
               </h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--muted)', maxWidth: '500px', margin: '0 auto 20px' }}>
-                Toàn bộ {createdTxResult.length} dòng vật tư đã được cập nhật vào thẻ kho, gắn mã dự án và ghi vết nhật ký bất biến AI Audit.
+                Toàn bộ {createdTxResult?.length || 1} dòng vật tư đã được cập nhật vào thẻ kho, gắn mã dự án và ghi vết nhật ký bất biến AI Audit.
               </p>
 
               <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
@@ -1006,7 +1029,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                 <select
                   value={manualForm.material_code}
                   onChange={(e) => {
-                    const mat = materialsCatalog.find(m => m.code === e.target.value);
+                    const mat = catalog.find(m => m.code === e.target.value);
                     setManualForm({
                       ...manualForm,
                       material_code: e.target.value,
@@ -1015,7 +1038,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                   }}
                   style={{ width: '100%', padding: '8px 10px', borderRadius: 'var(--radius-control)', border: '1px solid var(--control)', fontSize: '0.8rem' }}
                 >
-                  {materialsCatalog.map((m) => (
+                  {catalog.map((m: any) => (
                     <option key={m.code} value={m.code}>
                       {m.code} - {m.name} ({m.unit})
                     </option>
@@ -1101,9 +1124,9 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {alerts.map((alt) => (
+              {safeAlerts.map((alt: any, idx: number) => (
                 <div 
-                  key={alt.id}
+                  key={alt?.id || `alt-list-${idx}`}
                   style={{
                     border: '1px solid var(--border)',
                     borderRadius: 'var(--radius-card)',
@@ -1112,8 +1135,8 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span className={alt.severity === 'CRITICAL' ? 'pill neg' : alt.severity === 'WARNING' ? 'pill warn' : 'pill neutral'} style={{ fontSize: '0.65rem' }}>
-                      {alt.type}
+                    <span className={alt?.severity === 'CRITICAL' ? 'pill neg' : alt?.severity === 'WARNING' ? 'pill warn' : 'pill neutral'} style={{ fontSize: '0.65rem' }}>
+                      {alt?.type || alt?.alert_type || 'CẢNH BÁO'}
                     </span>
                     <button
                       onClick={() => setActiveEvidence(alt)}
@@ -1123,10 +1146,10 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                       <Eye size={12} /> Xem nguồn
                     </button>
                   </div>
-                  <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)', marginBottom: '3px' }}>{alt.title}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--muted)', lineHeight: 1.4 }}>{alt.description}</p>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)', marginBottom: '3px' }}>{alt?.title || alt?.material_name || 'Cảnh báo kho'}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--muted)', lineHeight: 1.4 }}>{alt?.description || alt?.message || ''}</p>
                   <p style={{ fontSize: '0.7rem', color: 'var(--faint)', marginTop: '8px' }}>
-                    Chứng cứ: <i>{alt.source_ref}</i>
+                    Chứng cứ: <i>{alt?.source_ref || 'Hệ thống kho'}</i>
                   </p>
                 </div>
               ))}
@@ -1145,53 +1168,64 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {suggestions.map((sug, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-card)',
-                    padding: '14px',
-                    background: sug.urgency === 'HIGH' ? 'var(--raised)' : 'var(--surface)'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>{sug.material_code}</span>
-                    <span className={sug.urgency === 'HIGH' ? 'pill neg' : 'pill neutral'} style={{ fontSize: '0.65rem' }}>
-                      {sug.urgency === 'HIGH' ? 'CẦN GẤP' : 'TIÊU CHUẨN'}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '0.85rem', fontWeight: 600 }}>{sug.material_name}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '2px' }}>
-                    Hiện có: <b>{sug.current_stock} {sug.unit}</b> | Ngưỡng an toàn: <b>{sug.min_stock_alert} {sug.unit}</b>
-                  </p>
-                  
-                  <div style={{
-                    marginTop: '8px',
-                    padding: '8px',
-                    background: 'var(--surface)',
-                    border: '1px dashed var(--border)',
-                    borderRadius: '4px',
-                    fontSize: '0.75rem'
-                  }}>
-                    <p>Đề xuất mua: <b style={{ color: 'var(--accent)' }}>{sug.suggested_purchase_qty} {sug.unit}</b> (&sim; {sug.estimated_total_cost.toLocaleString('vi-VN')} đ)</p>
-                    <p style={{ color: 'var(--faint)', fontSize: '0.7rem', marginTop: '2px' }}>Lý do: {sug.reason}</p>
-                  </div>
+              {safeSuggestions.map((sug: any, idx: number) => {
+                const sQty = sug?.suggested_purchase_qty ?? sug?.suggested_quantity ?? sug?.required_quantity ?? 0;
+                const sCost = sug?.estimated_total_cost ?? sug?.estimated_total ?? 0;
+                const sPhone = sug?.supplier_phone || '';
+                const cleanPhone = sPhone ? String(sPhone).replace(/\./g, '') : '';
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>
-                      NCC: <b>{sug.supplier_name}</b> ({sug.lead_time_days} ngày)
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius-card)',
+                      padding: '14px',
+                      background: sug?.urgency === 'HIGH' ? 'var(--raised)' : 'var(--surface)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>{sug?.material_code}</span>
+                      <span className={sug?.urgency === 'HIGH' ? 'pill neg' : 'pill neutral'} style={{ fontSize: '0.65rem' }}>
+                        {sug?.urgency === 'HIGH' ? 'CẦN GẤP' : 'TIÊU CHUẨN'}
+                      </span>
                     </div>
-                    <a
-                      href={`tel:${sug.supplier_phone.replace(/\./g, '')}`}
-                      className="btn-secondary"
-                      style={{ fontSize: '0.7rem', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
-                    >
-                      <Phone size={12} /> Gọi {sug.supplier_phone}
-                    </a>
+                    <p style={{ fontSize: '0.85rem', fontWeight: 600 }}>{sug?.material_name}</p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '2px' }}>
+                      Hiện có: <b>{sug?.current_stock ?? 0} {sug?.unit || ''}</b> | Ngưỡng an toàn: <b>{sug?.min_stock_alert ?? 0} {sug?.unit || ''}</b>
+                    </p>
+                    
+                    <div style={{
+                      marginTop: '8px',
+                      padding: '8px',
+                      background: 'var(--surface)',
+                      border: '1px dashed var(--border)',
+                      borderRadius: '4px',
+                      fontSize: '0.75rem'
+                    }}>
+                      <p>Đề xuất mua: <b style={{ color: 'var(--accent)' }}>{sQty} {sug?.unit || ''}</b> (&sim; {Number(sCost).toLocaleString('vi-VN')} đ)</p>
+                      <p style={{ color: 'var(--faint)', fontSize: '0.7rem', marginTop: '2px' }}>Lý do: {sug?.reason || 'Cân đối tiến độ đơn hàng'}</p>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>
+                        NCC: <b>{sug?.supplier_name || sug?.supplier || 'Nhà cung cấp'}</b> ({sug?.lead_time_days ?? 2} ngày)
+                      </div>
+                      {cleanPhone ? (
+                        <a
+                          href={`tel:${cleanPhone}`}
+                          className="btn-secondary"
+                          style={{ fontSize: '0.7rem', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
+                        >
+                          <Phone size={12} /> Gọi {sPhone}
+                        </a>
+                      ) : (
+                        <span style={{ fontSize: '0.7rem', color: 'var(--faint)' }}>Liên hệ bộ phận mua hàng</span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -1229,41 +1263,50 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((tx) => (
-                  <tr key={tx.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '8px 10px', fontWeight: 600 }}>{tx.tx_code}</td>
-                    <td style={{ padding: '8px 10px' }}>
-                      <span className={tx.tx_type === 'IN' ? 'pill pos' : 'pill neutral'} style={{ fontSize: '0.7rem' }}>
-                        {tx.tx_type === 'IN' ? 'NHẬP' : tx.tx_type === 'OUT' ? 'XUẤT' : 'ĐIỀU CHỈNH'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '8px 10px' }}>
-                      <p style={{ fontWeight: 600 }}>{tx.material_code}</p>
-                      <p style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{tx.material_name}</p>
-                    </td>
-                    <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700 }}>
-                      {tx.quantity} {tx.unit}
-                    </td>
-                    <td style={{ padding: '8px 10px', textAlign: 'right' }}>
-                      {tx.unit_price.toLocaleString('vi-VN')} đ
-                    </td>
-                    <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700 }}>
-                      {tx.total_value.toLocaleString('vi-VN')} đ
-                    </td>
-                    <td style={{ padding: '8px 10px' }}>
-                      <p style={{ fontWeight: 500 }}>{tx.receipt_no || 'N/A'}</p>
-                      <p style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{tx.partner_name || 'Nội bộ'}</p>
-                    </td>
-                    <td style={{ padding: '8px 10px' }}>
-                      <span className={tx.ai_confidence >= 0.90 ? 'pill pos' : tx.ai_confidence >= 0.70 ? 'pill warn' : 'pill neg'} style={{ fontSize: '0.7rem' }}>
-                        {(tx.ai_confidence * 100).toFixed(0)}%
-                      </span>
-                    </td>
-                    <td style={{ padding: '8px 10px', fontSize: '0.7rem', color: 'var(--faint)' }}>
-                      {new Date(tx.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}
-                    </td>
-                  </tr>
-                ))}
+                {safeTransactions.map((tx: any, idx: number) => {
+                  const txCode = tx?.tx_code || tx?.transaction_code || `TX-${tx?.id || idx}`;
+                  const txType = tx?.tx_type || tx?.transaction_type || 'IN';
+                  const unitPrice = Number(tx?.unit_price ?? 0);
+                  const totalVal = Number(tx?.total_value ?? tx?.total_amount ?? 0);
+                  const confidence = typeof tx?.ai_confidence === 'number' ? tx.ai_confidence : 0.95;
+                  const dateStr = tx?.created_at ? new Date(tx.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }) : 'Vừa xong';
+
+                  return (
+                    <tr key={tx?.id || `tx-${idx}`} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={{ padding: '8px 10px', fontWeight: 600 }}>{txCode}</td>
+                      <td style={{ padding: '8px 10px' }}>
+                        <span className={txType === 'IN' ? 'pill pos' : 'pill neutral'} style={{ fontSize: '0.7rem' }}>
+                          {txType === 'IN' ? 'NHẬP' : txType === 'OUT' ? 'XUẤT' : 'ĐIỀU CHỈNH'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px 10px' }}>
+                        <p style={{ fontWeight: 600 }}>{tx?.material_code}</p>
+                        <p style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{tx?.material_name}</p>
+                      </td>
+                      <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700 }}>
+                        {tx?.quantity ?? 0} {tx?.unit || 'Cây'}
+                      </td>
+                      <td style={{ padding: '8px 10px', textAlign: 'right' }}>
+                        {unitPrice.toLocaleString('vi-VN')} đ
+                      </td>
+                      <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 700 }}>
+                        {totalVal.toLocaleString('vi-VN')} đ
+                      </td>
+                      <td style={{ padding: '8px 10px' }}>
+                        <p style={{ fontWeight: 500 }}>{tx?.receipt_no || tx?.reference_code || 'N/A'}</p>
+                        <p style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{tx?.partner_name || 'Nội bộ'}</p>
+                      </td>
+                      <td style={{ padding: '8px 10px' }}>
+                        <span className={confidence >= 0.90 ? 'pill pos' : confidence >= 0.70 ? 'pill warn' : 'pill neg'} style={{ fontSize: '0.7rem' }}>
+                          {(confidence * 100).toFixed(0)}%
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px 10px', fontSize: '0.7rem', color: 'var(--faint)' }}>
+                        {dateStr}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -1305,12 +1348,12 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
             <div style={{ background: 'var(--raised)', padding: '14px', borderRadius: 'var(--radius-control)', marginBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <span className={activeEvidence.severity === 'CRITICAL' ? 'pill neg' : 'pill warn'} style={{ fontSize: '0.7rem' }}>
-                  {activeEvidence.type}
+                  {activeEvidence.type || activeEvidence.alert_type || 'CẢNH BÁO'}
                 </span>
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)' }}>Mã: {activeEvidence.material_code}</span>
               </div>
-              <p style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '4px' }}>{activeEvidence.title}</p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{activeEvidence.description}</p>
+              <p style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '4px' }}>{activeEvidence.title || activeEvidence.material_name || 'Cảnh báo tồn kho'}</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{activeEvidence.description || activeEvidence.message || ''}</p>
             </div>
 
             <div style={{ marginBottom: '18px' }}>
@@ -1329,7 +1372,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.7rem', color: 'var(--faint)' }}>
-                Nguồn: {activeEvidence.source_ref}
+                Nguồn: {activeEvidence.source_ref || 'Hệ thống kho'}
               </span>
               <button
                 onClick={() => setActiveEvidence(null)}

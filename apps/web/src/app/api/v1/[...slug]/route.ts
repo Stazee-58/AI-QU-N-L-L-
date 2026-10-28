@@ -231,40 +231,171 @@ let dailySummary = {
 // Inventory Transactions (G3)
 let inventoryTransactions = [
   {
-    id: 1,
+    id: 'TX-001',
+    tx_code: 'PNK-2026-001',
     transaction_code: 'PNK-2026-001',
     material_id: 1,
     material_code: 'VT-THEP-V50',
     material_name: 'Thép góc V50x50x5mm',
+    tx_type: 'IN',
     transaction_type: 'IN',
     quantity: 50.0,
     unit: 'Cây',
     unit_price: 245000.0,
+    total_value: 12250000.0,
     total_amount: 12250000.0,
+    partner_name: 'Công ty Cổ phần Thép Hòa Phát',
+    receipt_no: 'HĐ-88219',
     project_code: 'DA-2026-002',
     reference_code: 'PO-2026-001',
     performed_by: 6,
     operator_name: 'Lê Văn Chung',
     notes: 'Nhập kho đợt 1 từ Thép Hòa Phát',
+    ai_confidence: 0.95,
+    confidence_by_field: { quantity: 0.96, unit_price: 0.94, material_code: 0.98 },
     created_at: '2026-10-27T09:30:00Z'
   },
   {
-    id: 2,
+    id: 'TX-002',
+    tx_code: 'PXK-2026-001',
     transaction_code: 'PXK-2026-001',
     material_id: 1,
     material_code: 'VT-THEP-V50',
     material_name: 'Thép góc V50x50x5mm',
+    tx_type: 'OUT',
     transaction_type: 'OUT',
     quantity: 12.0,
     unit: 'Cây',
     unit_price: 245000.0,
+    total_value: 2940000.0,
     total_amount: 2940000.0,
+    partner_name: 'Tổ Cơ khí 1',
+    receipt_no: 'PXK-0412',
     project_code: 'DA-2026-002',
     reference_code: 'LSX-2026-002',
     performed_by: 6,
     operator_name: 'Lê Văn Chung',
     notes: 'Xuất phôi cho tổ cắt gia công',
+    ai_confidence: 0.96,
+    confidence_by_field: { quantity: 0.98, unit_price: 0.95, material_code: 0.96 },
     created_at: '2026-10-28T08:00:00Z'
+  }
+];
+
+// Inventory Alerts (G3 - List[InventoryAlertResponse])
+let inventoryAlerts = [
+  {
+    id: 'ALT-001',
+    type: 'TỒN ĐỌNG LÂU',
+    alert_type: 'EXCESS_OR_SLOW',
+    severity: 'WARNING',
+    title: 'Thép góc V50 tồn kho trên 45 ngày',
+    description: 'Còn 58 cây chưa xuất cho dự án mới, cần ưu tiên cấp cho đơn LSX-2026-002',
+    material_code: 'VT-THEP-V50',
+    material_name: 'Thép góc V50x50x5mm',
+    project_code: 'DA-2026-002',
+    source_ref: 'Thẻ kho PNK-2026-001 & Tồn kho thực tế',
+    evidence_details: {
+      'Tồn kho hiện tại': '58 Cây',
+      'Ngưỡng an toàn': '20 Cây',
+      'Ngày nhập gần nhất': '2026-09-12',
+      'Số ngày lưu kho': '46 ngày'
+    }
+  },
+  {
+    id: 'ALT-002',
+    type: 'THIẾU HÀNG LSX',
+    alert_type: 'LOW_STOCK',
+    severity: 'CRITICAL',
+    title: 'Sơn Epoxy xám dưới ngưỡng an toàn',
+    description: 'Hiện chỉ còn 3 thùng trong khi đơn LSX-2026-003 cần 6 thùng để hoàn thiện',
+    material_code: 'VT-SON-EPOXY',
+    material_name: 'Sơn Epoxy chống gỉ',
+    project_code: 'DA-2026-003',
+    source_ref: 'Định mức BOM LSX-2026-003 & Sổ kho',
+    evidence_details: {
+      'Tồn kho hiện tại': '3 Thùng',
+      'Nhu cầu LSX-003': '6 Thùng',
+      'Thiếu hụt': '3 Thùng',
+      'Thời hạn hoàn thành': '2026-10-30'
+    }
+  },
+  {
+    id: 'ALT-003',
+    type: 'VƯỢT ĐỊNH MỨC',
+    alert_type: 'EXCEED_NORM',
+    severity: 'WARNING',
+    title: 'Thép hộp 50x100 xuất vượt định mức 8%',
+    description: 'Đã xuất 18 cây dầm thép cho LSX-2026-002 vượt định mức thiết kế ban đầu (16 cây)',
+    material_code: 'VT-THEP-HOP50',
+    material_name: 'Thép hộp 50x100 dày 2mm',
+    project_code: 'DA-2026-002',
+    source_ref: 'Phiếu xuất PXK-2026-001 vs Định mức CAD',
+    evidence_details: {
+      'Định mức BOM': '16 Cây',
+      'Thực xuất': '18 Cây',
+      'Tỷ lệ vượt': '12.5%',
+      'Lý do ghi nhận': 'Hỏng phôi khi uốn dầm'
+    }
+  },
+  {
+    id: 'ALT-004',
+    type: 'LỆCH TỒN KHO',
+    alert_type: 'DISCREPANCY',
+    severity: 'INFO',
+    title: 'Tấm Inox 304 lệch 1 tấm so với sổ sách',
+    description: 'Kiểm kê thực tế 12 tấm, hệ thống ghi 11 tấm sau đợt kiểm kho sáng nay',
+    material_code: 'VT-INOX-304',
+    material_name: 'Tấm Inox 304 xước dày 1.5mm',
+    project_code: 'DA-2026-001',
+    source_ref: 'Biên bản kiểm kê KK-2026-10-28',
+    evidence_details: {
+      'Số lượng sổ sách': '11 Tấm',
+      'Kiểm kê thực tế': '12 Tấm',
+      'Chênh lệch': '+1 Tấm'
+    }
+  }
+];
+
+// Purchase Suggestions (G3 - List[PurchaseSuggestionResponse])
+let purchaseSuggestions = [
+  {
+    material_code: 'VT-THEP-V50',
+    material_name: 'Thép góc V50x50x5mm',
+    unit: 'Cây',
+    current_stock: 58.0,
+    min_stock_alert: 20.0,
+    suggested_purchase_qty: 100.0,
+    suggested_quantity: 100.0,
+    required_quantity: 60.0,
+    estimated_unit_price: 245000.0,
+    estimated_total_cost: 24500000.0,
+    estimated_total: 24500000.0,
+    supplier_name: 'Công ty Cổ phần Thép Hòa Phát',
+    supplier: 'Công ty Cổ phần Thép Hòa Phát',
+    supplier_phone: '0908.123.456',
+    lead_time_days: 2,
+    urgency: 'HIGH',
+    reason: 'Cung ứng gấp cho LSX-2026-002 đang quá hạn tiến độ 2 ngày'
+  },
+  {
+    material_code: 'VT-SON-EPOXY',
+    material_name: 'Sơn Epoxy chống gỉ 2 thành phần',
+    unit: 'Thùng',
+    current_stock: 3.0,
+    min_stock_alert: 4.0,
+    suggested_purchase_qty: 10.0,
+    suggested_quantity: 10.0,
+    required_quantity: 6.0,
+    estimated_unit_price: 1250000.0,
+    estimated_total_cost: 12500000.0,
+    estimated_total: 12500000.0,
+    supplier_name: 'Công ty TNHH Sơn Jotun Việt Nam',
+    supplier: 'Công ty TNHH Sơn Jotun Việt Nam',
+    supplier_phone: '0903.888.777',
+    lead_time_days: 1,
+    urgency: 'HIGH',
+    reason: 'Kho chỉ còn 3 thùng, thiếu 6 thùng để giao đơn LSX-2026-003 trước 30/10'
   }
 ];
 
@@ -625,48 +756,14 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     return NextResponse.json(productionLogs);
   }
 
-  // 9. Inventory Alerts
+  // 9. Inventory Alerts (List[InventoryAlertResponse])
   if (path === 'inventory/alerts') {
-    return NextResponse.json({
-      alerts: [
-        {
-          material_code: 'VT-THEP-V50',
-          material_name: 'Thép góc V50x50x5mm',
-          current_stock: 58.0,
-          min_stock: 20.0,
-          alert_type: 'EXCESS_OR_SLOW',
-          severity: 'WARNING',
-          message: 'Tồn đọng > 45 ngày: Còn 58 cây chưa xuất cho dự án mới'
-        },
-        {
-          material_code: 'VT-SON-EPOXY',
-          material_name: 'Sơn Epoxy chống gỉ',
-          current_stock: 3.0,
-          min_stock: 4.0,
-          alert_type: 'LOW_STOCK',
-          severity: 'CRITICAL',
-          message: 'Dưới mức an toàn: Hiện còn 3/4 thùng (Cần cho LSX-003)'
-        }
-      ]
-    });
+    return NextResponse.json(inventoryAlerts);
   }
 
-  // 10. Inventory Purchase Suggestions
+  // 10. Inventory Purchase Suggestions (List[PurchaseSuggestionResponse])
   if (path === 'inventory/purchase-suggestions') {
-    return NextResponse.json({
-      suggestions: [
-        {
-          material_code: 'VT-THEP-V50',
-          material_name: 'Thép góc V50x50x5mm',
-          required_quantity: 60.0,
-          suggested_quantity: 100.0,
-          estimated_unit_price: 245000.0,
-          estimated_total: 24500000.0,
-          reason: 'Cung ứng gấp cho LSX-2026-002 đang quá hạn',
-          supplier: 'Công ty Cổ phần Thép Hòa Phát'
-        }
-      ]
-    });
+    return NextResponse.json(purchaseSuggestions);
   }
 
   // 11. Inventory Transactions
@@ -809,97 +906,218 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     return NextResponse.json(newLog, { status: 201 });
   }
 
-  // 6. OCR Receipt Parsing (G3)
+  // 6. OCR Receipt Parsing (G3 - ReceiptOCRResponse)
   if (path === 'inventory/ocr-receipt') {
-    return NextResponse.json({
-      ocr_confidence_score: 0.94,
-      suggested_project_id: 2,
-      suggested_project_code: 'DA-2026-002',
-      receipt_number: 'HD-2026-0452',
-      vendor_name: 'Công ty Cổ phần Thép Hòa Phát',
-      items: [
+    const text = body.ocr_raw_text || body.raw_text || '';
+    const isSusPrice = text.includes('350000') || text.includes('Đại Nam') || text.includes('BB-3301');
+    const isEpoxy = text.includes('Sơn') || text.includes('Jotun') || text.includes('PGH-4412');
+    const isOut = text.includes('XUẤT KHO') || text.includes('PXK') || text.includes('PXK-0412');
+
+    let receipt_no = 'HĐ-88219';
+    let receipt_type = isOut ? 'OUT' : 'IN';
+    let partner_name = isEpoxy ? 'Công ty TNHH Sơn Jotun Việt Nam' : isSusPrice ? 'Công ty Thép Đại Nam' : isOut ? 'Tổ Cơ khí 1 (Tổ trưởng Bình)' : 'Công ty Cổ phần Thép Hòa Phát';
+    let project_code = isOut ? 'DA-2026-001' : 'DA-2026-002';
+    let po_code = isOut ? '' : 'PO-2026-001';
+    let work_order_code = isOut ? 'LSX-2026-001' : '';
+
+    let items: any[] = [];
+    if (isEpoxy) {
+      receipt_no = 'PGH-4412';
+      items = [
         {
-          material_code: 'VT-THEP-V50',
-          material_name: 'Thép góc V50x50x5mm',
-          quantity: 100.0,
-          unit: 'Cây',
-          unit_price: 245000.0,
-          total_amount: 24500000.0,
-          confidence_qty: 0.98,
+          item_name: 'Sơn Epoxy chống gỉ 2 thành phần (ghi xám)',
+          material_code: 'VT-SON-EPOXY',
+          unit: 'Thùng',
+          quantity: 10.0,
+          unit_price: 1200000.0,
+          total_amount: 12000000.0,
+          confidence_quantity: 0.88,
           confidence_price: 0.95,
-          flag_reason: null
-        },
-        {
-          material_code: 'VT-THEP-HOP50',
-          material_name: 'Thép hộp 50x100 dày 2mm',
-          quantity: 50.0,
-          unit: 'Cây',
-          unit_price: 395000.0,
-          total_amount: 19750000.0,
-          confidence_qty: 0.96,
-          confidence_price: 0.65,
-          flag_reason: 'Lệch giá: Đơn giá hóa đơn (395.000đ) cao hơn giá chuẩn catalog (380.000đ)'
+          confidence_material_code: 0.96,
+          flag_reason: 'Số lượng viết tay nét mờ: Cần thủ kho kiểm tra thực tế thùng giao'
         }
-      ]
+      ];
+    } else if (isSusPrice) {
+      receipt_no = 'BB-3301';
+      items = [
+        {
+          item_name: 'Thép góc V50x50x5mm',
+          material_code: 'VT-THEP-V50',
+          unit: 'Cây',
+          quantity: 60.0,
+          unit_price: 350000.0,
+          total_amount: 21000000.0,
+          confidence_quantity: 0.98,
+          confidence_price: 0.58,
+          confidence_material_code: 0.95,
+          flag_reason: 'Đơn giá 350.000đ cao hơn 42.8% so với catalog chuẩn (245.000đ)!'
+        }
+      ];
+    } else if (isOut) {
+      receipt_no = 'PXK-0412';
+      items = [
+        {
+          item_name: 'Thép góc V50x50x5mm cấp gia công LSX-001',
+          material_code: 'VT-THEP-V50',
+          unit: 'Cây',
+          quantity: 25.0,
+          unit_price: 245000.0,
+          total_amount: 6125000.0,
+          confidence_quantity: 0.98,
+          confidence_price: 0.95,
+          confidence_material_code: 0.96,
+          flag_reason: null
+        }
+      ];
+    } else {
+      items = [
+        {
+          item_name: 'Thép góc V50x50x5mm mạ kẽm Hòa Phát',
+          material_code: 'VT-THEP-V50',
+          unit: 'Cây',
+          quantity: 50.0,
+          unit_price: 240000.0,
+          total_amount: 12000000.0,
+          confidence_quantity: 0.96,
+          confidence_price: 0.94,
+          confidence_material_code: 0.98,
+          flag_reason: null
+        }
+      ];
+    }
+
+    const total_value = items.reduce((acc, it) => acc + (it.total_amount || 0), 0);
+    const suspicious_count = items.filter(it => (it.confidence_price < 0.70 || it.confidence_quantity < 0.90)).length;
+
+    return NextResponse.json({
+      receipt_no,
+      receipt_number: receipt_no,
+      receipt_type,
+      receipt_date: '2026-10-28',
+      partner_name,
+      vendor_name: partner_name,
+      project_code,
+      suggested_project_code: project_code,
+      work_order_code,
+      po_code,
+      items,
+      total_value,
+      total_amount: total_value,
+      overall_confidence: isSusPrice ? 0.68 : isEpoxy ? 0.88 : 0.95,
+      ocr_confidence_score: isSusPrice ? 0.68 : isEpoxy ? 0.88 : 0.95,
+      suspicious_fields_count: suspicious_count,
+      needs_manual_review: suspicious_count > 0,
+      raw_ocr_text: text || `PHIẾU KHO SỐ: ${receipt_no} Ngày: 28/10/2026\nĐơn vị: ${partner_name}`
     });
   }
 
-  // 7. Inventory Batch Transactions (G3)
+  // 7. Inventory Batch Transactions (G3 - List[InventoryTransactionResponse])
   if (path === 'inventory/batch-transactions') {
-    const items = body.items || [];
-    items.forEach((it: any) => {
+    const rawItems = body.items || [];
+    const createdList: any[] = [];
+
+    rawItems.forEach((it: any, idx: number) => {
+      const q = Number(it.quantity) || 0;
+      const p = Number(it.unit_price) || 0;
+      const mat = materials.find(m => m.code === it.material_code);
+      const matName = mat ? mat.name : (it.item_name || it.material_code || 'Vật tư');
+      const unit = mat ? mat.unit : (it.unit || 'Cây');
+      const txCode = `${body.receipt_type === 'OUT' ? 'PXK' : 'PNK'}-2026-00${inventoryTransactions.length + 1}`;
+
       const tx = {
-        id: inventoryTransactions.length + 1,
-        transaction_code: `PNK-2026-00${inventoryTransactions.length + 1}`,
-        material_id: 1,
+        id: `TX-${Date.now()}-${idx}`,
+        tx_code: txCode,
+        transaction_code: txCode,
+        material_id: mat ? mat.id : 1,
         material_code: it.material_code,
-        material_name: it.material_name,
+        material_name: matName,
+        tx_type: body.receipt_type || 'IN',
         transaction_type: body.receipt_type || 'IN',
-        quantity: Number(it.quantity) || 0,
-        unit: it.unit || 'Cây',
-        unit_price: Number(it.unit_price) || 0,
-        total_amount: (Number(it.quantity) || 0) * (Number(it.unit_price) || 0),
-        project_code: body.project_code || 'DA-2026-002',
-        reference_code: body.receipt_number || 'PNK-G3-OCR',
+        quantity: q,
+        unit: unit,
+        unit_price: p,
+        total_value: q * p,
+        total_amount: q * p,
+        project_code: body.project_id || body.project_code || 'DA-2026-002',
+        reference_code: body.receipt_no || body.receipt_number || 'PNK-G3-OCR',
+        receipt_no: body.receipt_no || body.receipt_number || 'PNK-G3-OCR',
+        partner_name: body.partner_name || 'Hệ thống',
         performed_by: 6,
         operator_name: 'Lê Văn Chung',
-        notes: 'Xác nhận nhập kho từ OCR phiếu thông minh',
+        notes: it.notes || it.flag_reason || 'Ghi thẻ kho từ OCR phiếu thông minh',
+        ai_confidence: body.ai_confidence || 0.95,
+        confidence_by_field: it.confidence_by_field || {
+          quantity: it.confidence_quantity || 0.95,
+          unit_price: it.confidence_price || 0.95,
+          material_code: it.confidence_material_code || 0.95
+        },
         created_at: new Date().toISOString()
       };
+
       inventoryTransactions.unshift(tx);
+      createdList.push(tx);
 
       // Cập nhật tồn kho thực tế
-      const mat = materials.find(m => m.code === it.material_code);
       if (mat) {
-        if (body.receipt_type === 'OUT') mat.current_stock -= tx.quantity;
-        else mat.current_stock += tx.quantity;
+        if (body.receipt_type === 'OUT') {
+          mat.current_stock = Math.max(0, mat.current_stock - q);
+        } else {
+          mat.current_stock += q;
+        }
       }
     });
 
-    return NextResponse.json({ message: 'Lưu kho thành công', count: items.length }, { status: 201 });
+    return NextResponse.json(createdList, { status: 201 });
   }
 
-  // 8. Manual Inventory Transaction (G3)
+  // 8. Manual Inventory Transaction (G3 - InventoryTransactionResponse)
   if (path === 'inventory/manual-transaction') {
+    const q = Number(body.quantity) || 1;
+    const p = Number(body.unit_price) || 245000;
+    const mat = materials.find(m => m.code === body.material_code);
+    const matName = mat ? mat.name : (body.material_name || body.material_code || 'Vật tư');
+    const unit = mat ? mat.unit : (body.unit || 'Cây');
+    const txCode = body.tx_type === 'OUT' || body.transaction_type === 'OUT'
+      ? `PXK-MANUAL-${inventoryTransactions.length + 1}`
+      : `PNK-MANUAL-${inventoryTransactions.length + 1}`;
+
     const tx = {
-      id: inventoryTransactions.length + 1,
-      transaction_code: body.transaction_type === 'IN' ? `PNK-2026-00${inventoryTransactions.length + 1}` : `PXK-2026-00${inventoryTransactions.length + 1}`,
-      material_id: body.material_id || 1,
+      id: `TX-MANUAL-${Date.now()}`,
+      tx_code: txCode,
+      transaction_code: txCode,
+      material_id: mat ? mat.id : 1,
       material_code: body.material_code || 'VT-THEP-V50',
-      material_name: body.material_name || 'Thép góc V50x50x5mm',
-      transaction_type: body.transaction_type || 'IN',
-      quantity: Number(body.quantity) || 1,
-      unit: body.unit || 'Cây',
-      unit_price: Number(body.unit_price) || 245000,
-      total_amount: (Number(body.quantity) || 1) * (Number(body.unit_price) || 245000),
-      project_code: body.project_code || 'DA-2026-001',
-      reference_code: body.reference_code || 'MANUAL-ENTRY',
+      material_name: matName,
+      tx_type: body.tx_type || body.transaction_type || 'IN',
+      transaction_type: body.tx_type || body.transaction_type || 'IN',
+      quantity: q,
+      unit: unit,
+      unit_price: p,
+      total_value: q * p,
+      total_amount: q * p,
+      project_code: body.project_id || body.project_code || 'DA-2026-001',
+      reference_code: body.receipt_no || 'MANUAL-ENTRY',
+      receipt_no: body.receipt_no || 'MANUAL-ENTRY',
+      partner_name: body.partner_name || 'Đại lý Kim khí Hà Nội',
       performed_by: 6,
       operator_name: 'Lê Văn Chung',
-      notes: body.notes || 'Nhập thẻ kho thủ công',
+      notes: body.notes || 'Nhập thẻ kho thủ công (Không dùng AI)',
+      ai_confidence: 1.0,
+      confidence_by_field: { quantity: 1.0, unit_price: 1.0, material_code: 1.0 },
       created_at: new Date().toISOString()
     };
+
     inventoryTransactions.unshift(tx);
+
+    // Cập nhật tồn kho thực tế
+    if (mat) {
+      if (tx.tx_type === 'OUT') {
+        mat.current_stock = Math.max(0, mat.current_stock - q);
+      } else {
+        mat.current_stock += q;
+      }
+    }
+
     return NextResponse.json(tx, { status: 201 });
   }
 
