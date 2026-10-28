@@ -5,3 +5,4 @@
   "buildCommand": "npm --prefix apps/web run build",
   "outputDirectory": "apps/web/.next"
 }
+

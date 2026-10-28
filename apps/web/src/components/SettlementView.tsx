@@ -170,7 +170,7 @@ export default function SettlementView({ token, currentUser }: SettlementViewPro
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.8rem', color: isSelected ? 'var(--accent)' : 'var(--text)' }}>
-                  {s.project_code}
+                  {s.project_code || s.project_id}
                 </span>
                 <span className={isFinal ? 'pill pos' : 'pill warn'} style={{ fontSize: '0.65rem' }}>
                   {isFinal ? 'ĐÃ KHÓA SỔ' : 'DỰ THẢO'}
@@ -250,22 +250,22 @@ export default function SettlementView({ token, currentUser }: SettlementViewPro
             {/* Lãi gộp thực tế */}
             <div className="card" style={{ padding: '16px' }}>
               <span style={{ fontSize: '0.7rem', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 }}>Lãi Gộp Thực Tế</span>
-              <p style={{ fontSize: '1.25rem', fontWeight: 800, color: currentSettlement.gross_profit > 0 ? 'var(--positive)' : 'var(--negative)', marginTop: '4px' }}>
-                {formatVND(currentSettlement.gross_profit)}
+              <p style={{ fontSize: '1.25rem', fontWeight: 800, color: (currentSettlement.gross_profit || 0) > 0 ? 'var(--positive)' : 'var(--negative)', marginTop: '4px' }}>
+                {formatVND(currentSettlement.gross_profit || 0)}
               </p>
-              <span className={currentSettlement.profit_margin_pct >= 20 ? 'pill pos' : 'pill warn'} style={{ fontSize: '0.65rem', marginTop: '6px' }}>
-                Biên lãi: {currentSettlement.profit_margin_pct}%
+              <span className={(currentSettlement.profit_margin_pct ?? currentSettlement.margin_pct ?? 0) >= 20 ? 'pill pos' : 'pill warn'} style={{ fontSize: '0.65rem', marginTop: '6px' }}>
+                Biên lãi: {currentSettlement.profit_margin_pct ?? currentSettlement.margin_pct ?? 0}%
               </span>
             </div>
 
             {/* Công nợ còn phải thu */}
             <div className="card" style={{ padding: '16px' }}>
               <span style={{ fontSize: '0.7rem', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 }}>Công Nợ Khách Còn Nợ</span>
-              <p style={{ fontSize: '1.25rem', fontWeight: 800, color: currentSettlement.remaining_receivable > 0 ? 'var(--warning)' : 'var(--positive)', marginTop: '4px' }}>
-                {formatVND(currentSettlement.remaining_receivable)}
+              <p style={{ fontSize: '1.25rem', fontWeight: 800, color: (currentSettlement.remaining_receivable ?? (currentSettlement.contract_value - (currentSettlement.amount_paid || 0))) > 0 ? 'var(--warning)' : 'var(--positive)', marginTop: '4px' }}>
+                {formatVND(currentSettlement.remaining_receivable ?? (currentSettlement.contract_value - (currentSettlement.amount_paid || 0)))}
               </p>
               <span style={{ fontSize: '0.7rem', color: 'var(--muted)', display: 'block', marginTop: '4px' }}>
-                Đã thu: {formatVND(currentSettlement.amount_paid)}
+                Đã thu: {formatVND(currentSettlement.amount_paid || 0)}
               </span>
             </div>
           </div>
@@ -295,7 +295,7 @@ export default function SettlementView({ token, currentUser }: SettlementViewPro
                     </tr>
                   </thead>
                   <tbody>
-                    {currentSettlement.materials_detail.map((m: any, idx: number) => (
+                    {(currentSettlement.materials_detail || []).map((m: any, idx: number) => (
                       <tr key={idx} style={{ borderBottom: '1px solid var(--border)', background: m.is_over_budget ? '#fff1f2' : undefined }}>
                         <td style={{ padding: '8px' }}>
                           <p style={{ fontWeight: 600 }}>{m.material_code}</p>
@@ -347,7 +347,7 @@ export default function SettlementView({ token, currentUser }: SettlementViewPro
                     </tr>
                   </thead>
                   <tbody>
-                    {currentSettlement.labor_detail.map((l: any, idx: number) => (
+                    {(currentSettlement.labor_detail || []).map((l: any, idx: number) => (
                       <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                         <td style={{ padding: '8px' }}>
                           <p style={{ fontWeight: 600 }}>{l.work_order_code}</p>
@@ -394,7 +394,7 @@ export default function SettlementView({ token, currentUser }: SettlementViewPro
                 </div>
                 <div>
                   <span style={{ color: 'var(--muted)' }}>Người chốt quyết toán:</span>
-                  <p style={{ fontWeight: 600, marginTop: '2px' }}>{currentSettlement.finalized_by_name || currentUser.full_name}</p>
+                  <p style={{ fontWeight: 600, marginTop: '2px' }}>{currentSettlement.finalized_by_name || currentUser?.full_name || 'Quản lý'}</p>
                 </div>
                 <div>
                   <span style={{ color: 'var(--muted)' }}>Nội dung đánh giá bàn giao:</span>

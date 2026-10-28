@@ -32,7 +32,7 @@ let users = [
   { id: 8, username: 'ketoan', full_name: 'Kế toán trưởng Hoàng Kim Oanh', phone: '0901000007', role_id: 8, is_active: true, role: ROLES[7] }
 ];
 
-// Materials Catalog
+// Materials Catalog (FastAPI returns List[MaterialResponse] - Array format)
 let materials = [
   { id: 1, code: 'VT-THEP-V50', name: 'Thép góc V50x50x5mm', spec: 'Mạ kẽm nhúng nóng, cây tiêu chuẩn 6m', unit: 'Cây', category: 'Thép kết cấu', standard_price: 245000.0, min_stock_alert: 20.0, current_stock: 58.0 },
   { id: 2, code: 'VT-THEP-HOP50', name: 'Thép hộp 50x100 dày 2mm', spec: 'Thép hộp mạ kẽm Hòa Phát, cây 6m', unit: 'Cây', category: 'Thép kết cấu', standard_price: 380000.0, min_stock_alert: 15.0, current_stock: 34.0 },
@@ -66,6 +66,7 @@ let workOrders = [
     status: 'IN_PROGRESS',
     risk_level: 'NORMAL',
     risk_reason: null,
+    progress_percent: 75.0,
     progress_pct: 75.0,
     bom_snapshot: { materials: [{ material_code: 'VT-THEP-V50', norm_per_unit: 0.5, total_required: 2.0 }] }
   },
@@ -86,6 +87,7 @@ let workOrders = [
     status: 'IN_PROGRESS',
     risk_level: 'CRITICAL',
     risk_reason: 'Đã quá hạn giao 2 ngày! Thiếu phôi thép góc V50 và kẹt máy cắt',
+    progress_percent: 30.0,
     progress_pct: 30.0,
     bom_snapshot: { materials: [{ material_code: 'VT-THEP-V50', norm_per_unit: 0.4, total_required: 20.0 }] }
   },
@@ -106,6 +108,7 @@ let workOrders = [
     status: 'IN_PROGRESS',
     risk_level: 'WARNING',
     risk_reason: 'Chỉ còn 2 ngày, thiếu sơn Epoxy xám và nhân công hàn bận ca khác',
+    progress_percent: 31.25,
     progress_pct: 31.25,
     bom_snapshot: { materials: [{ material_code: 'VT-INOX-304', norm_per_unit: 0.25, total_required: 20.0 }] }
   }
@@ -122,7 +125,7 @@ let productionLogs = [
     foreman_id: 5,
     shift_date: '2026-10-28',
     shift_type: 'DAY',
-    stage_name: 'Sơn phủ',
+    stage_name: 'Sơn',
     completed_qty: 1.0,
     worker_count: 4,
     total_man_hours: 32.0,
@@ -140,7 +143,7 @@ let productionLogs = [
     foreman_id: 5,
     shift_date: '2026-10-28',
     shift_type: 'DAY',
-    stage_name: 'Cắt phôi',
+    stage_name: 'Cắt',
     completed_qty: 5.0,
     worker_count: 3,
     total_man_hours: 24.0,
@@ -151,16 +154,78 @@ let productionLogs = [
   }
 ];
 
-// Daily Summaries (G2)
+// Daily Summaries (G2) - Nested 3 versions according to DailySummaryResponse schema
 let dailySummary = {
-  date: '2026-10-28',
-  director_summary: 'Xưởng đang chạy 3 lệnh sản xuất. LSX-002 (Xưởng Tân Bình) đang trễ tiến độ 2 ngày do thiếu phôi thép góc V50 và kẹt máy cắt CNC. LSX-003 có nguy cơ trễ 2 ngày tới. Cần ưu tiên thủ kho nhập vật tư và điều phối thợ hàn tăng ca.',
-  tech_summary: 'Máy cắt CNC số 2 bị kẹt bàn trượt đã được bảo trì tạm thời, cần thay bạc đạn trong tuần. Định mức phôi thép V50 cho LSX-002 đang thiếu hụt 20 cây.',
-  sales_summary: 'Cổng nhôm Biệt thự Cậu Long (DA-001) đạt 75% tiến độ, dự kiến nghiệm thu đúng hạn 30/10. Khách hàng Riverside yêu cầu kiểm tra màu sơn lan can vào ngày mai.',
-  total_output_today: '6 sản phẩm hoàn thành',
-  total_man_hours: 56.0,
-  alert_count: 2,
-  generated_at: new Date().toISOString()
+  shift_date: '2026-10-28',
+  generated_at: new Date().toISOString(),
+  director_summary: {
+    title: 'BÁO CÁO ĐIỀU HÀNH SÁNG 28/10/2026',
+    kpis: {
+      total_active_orders: 3,
+      delayed_risk_count: 2,
+      today_logs_count: 3,
+      today_units_completed: 6,
+      today_man_hours: 56.0,
+      estimated_wip_value: 1250000000.0
+    },
+    critical_alerts: [
+      'Đơn LSX-2026-002 (Khung dầm thép chịu lực I-300): Đã quá hạn giao 2 ngày! Thiếu phôi thép góc V50 và kẹt máy cắt CNC',
+      'Đơn LSX-2026-003 (Lan can Inox 304 uốn cong nghệ thuật): Chỉ còn 2 ngày, thiếu sơn Epoxy xám và nhân công hàn bận ca khác'
+    ],
+    waiting_approval: [
+      'Báo giá Dự án Biệt thự Cậu Long (145.000.000đ) chờ duyệt',
+      'Phiếu xuất kho vượt định mức LSX-002 (thêm 3 cây thép V50)'
+    ],
+    one_sentence_takeaway: 'Xưởng đang vận hành 3 đơn hàng. Có 2 đơn cần can thiệp xử lý gấp để tránh trễ cam kết giao hàng.'
+  },
+  tech_summary: {
+    title: 'BẢNG ĐIỀU HÀNH KỸ THUẬT & TIẾN ĐỘ XƯỞNG (28/10/2026)',
+    stages: {
+      'Cắt': { qty: 5.0, hours: 24.0, workers: 3 },
+      'Hàn': { qty: 10.0, hours: 36.0, workers: 4 },
+      'Sơn': { qty: 1.0, hours: 32.0, workers: 4 },
+      'Lắp ráp': { qty: 3.0, hours: 20.0, workers: 3 },
+      'Đóng gói': { qty: 0.0, hours: 0.0, workers: 0 }
+    },
+    reported_issues: [
+      { work_order: 'LSX-2026-002', foreman: 'Tổ trưởng xưởng Trần Văn Bình', issue: 'Máy cắt CNC kẹt bàn đẩy 45 phút' },
+      { work_order: 'LSX-2026-003', foreman: 'Tổ trưởng xưởng Trần Văn Bình', issue: 'Hết que hàn Inox đặc biệt' }
+    ],
+    logs_detail: []
+  },
+  sales_summary: {
+    title: 'VIỆC CẦN LÀM HÔM NAY DÀNH CHO KINH DOANH (28/10/2026)',
+    ready_to_dispatch: [
+      {
+        customer: 'Ông Long (Quận 7, TP.HCM)',
+        phone: '0908889999',
+        order_code: 'LSX-2026-001',
+        product: 'Cổng nhôm đúc 4 cánh hoa văn rồng',
+        progress: '75%',
+        action: 'Gọi khách xác nhận ngày giờ bàn giao và khảo sát vị trí lắp đặt'
+      }
+    ],
+    need_customer_call: [
+      {
+        customer: 'Công ty TNHH Tân Bình',
+        phone: '0907776655',
+        order_code: 'LSX-2026-002',
+        product: 'Khung dầm thép chịu lực I-300',
+        reason: 'Đã quá hạn giao 2 ngày! Thiếu phôi thép góc V50 và kẹt máy cắt CNC',
+        action: 'Chủ động gọi xin gia hạn tiến độ giao dầm thêm 3 ngày'
+      },
+      {
+        customer: 'Tập đoàn Riverside',
+        phone: '0903332211',
+        order_code: 'LSX-2026-003',
+        product: 'Lan can Inox 304 uốn cong nghệ thuật',
+        reason: 'Chỉ còn 2 ngày, thiếu sơn Epoxy xám và nhân công hàn bận ca khác',
+        action: 'Cập nhật tình hình nghiệm thu màu sơn vào chiều nay'
+      }
+    ],
+    action_count: 3
+  },
+  delayed_orders: []
 };
 
 // Inventory Transactions (G3)
@@ -203,55 +268,180 @@ let inventoryTransactions = [
   }
 ];
 
-// Settlements (G5)
+// Settlements (G5) - Matches ProjectSettlementResponse schema with materials_detail and labor_detail
 let settlements = [
   {
-    id: 1,
+    id: 'DA-2026-001',
     project_id: 'DA-2026-001',
+    project_code: 'DA-2026-001',
     project_name: 'Cổng nhôm đúc Biệt thự Cậu Long',
     customer_name: 'Ông Long (Quận 7, TP.HCM)',
+    customer_phone: '0908889999',
     contract_value: 350000000.0,
+    estimated_cost: 250000000.0,
     actual_material_cost: 180000000.0,
     actual_labor_cost: 65000000.0,
     actual_subcontractor_cost: 15000000.0,
-    total_cost: 260000000.0,
+    actual_other_cost: 15000000.0,
+    total_actual_cost: 260000000.0,
     gross_profit: 90000000.0,
+    profit_margin_pct: 25.71,
     margin_pct: 25.71,
+    amount_paid: 280000000.0,
+    remaining_receivable: 70000000.0,
     status: 'READY_FOR_FINALIZATION',
-    settlement_date: '2026-10-28',
-    variance_reason: 'Tiết kiệm 5% chi phí nhân công nhờ tối ưu ca đêm'
+    acceptance_status: 'ACCEPTED',
+    acceptance_date: '2026-10-28',
+    acceptance_notes: 'Nghiệm thu đạt chuẩn bề mặt sơn và khớp khóa tự động.',
+    materials_detail: [
+      {
+        material_code: 'VT-THEP-V50',
+        material_name: 'Thép góc V50x50x5mm',
+        unit: 'Cây',
+        norm_qty: 20.0,
+        actual_issued_qty: 20.0,
+        variance_qty: 0.0,
+        variance_pct: 0.0,
+        unit_price: 245000.0,
+        actual_cost: 4900000.0,
+        is_over_budget: false
+      },
+      {
+        material_code: 'VT-SON-EPOXY',
+        material_name: 'Sơn Epoxy chống gỉ 2 thành phần',
+        unit: 'Thùng',
+        norm_qty: 4.0,
+        actual_issued_qty: 3.5,
+        variance_qty: -0.5,
+        variance_pct: -12.5,
+        unit_price: 1250000.0,
+        actual_cost: 4375000.0,
+        is_over_budget: false
+      }
+    ],
+    labor_detail: [
+      {
+        work_order_code: 'LSX-2026-001',
+        stage_name: 'Sơn phủ hoàn thiện',
+        shift_count: 2,
+        total_man_hours: 32.0,
+        hourly_rate: 50000.0,
+        labor_cost: 1600000.0
+      },
+      {
+        work_order_code: 'LSX-2026-001',
+        stage_name: 'Lắp ráp cánh cổng',
+        shift_count: 3,
+        total_man_hours: 48.0,
+        hourly_rate: 50000.0,
+        labor_cost: 2400000.0
+      }
+    ],
+    warnings: [
+      'Tiết kiệm 5% chi phí nhân công so với định mức ban đầu nhờ tối ưu ca.'
+    ]
   },
   {
-    id: 2,
+    id: 'DA-2026-002',
     project_id: 'DA-2026-002',
+    project_code: 'DA-2026-002',
     project_name: 'Khung thép tiền chế Xưởng Tân Bình',
     customer_name: 'Công ty TNHH Tân Bình',
+    customer_phone: '0907776655',
     contract_value: 680000000.0,
+    estimated_cost: 500000000.0,
     actual_material_cost: 395000000.0,
     actual_labor_cost: 120000000.0,
     actual_subcontractor_cost: 30000000.0,
-    total_cost: 545000000.0,
+    actual_other_cost: 30000000.0,
+    total_actual_cost: 545000000.0,
     gross_profit: 135000000.0,
+    profit_margin_pct: 19.85,
     margin_pct: 19.85,
+    amount_paid: 400000000.0,
+    remaining_receivable: 280000000.0,
     status: 'IN_PROGRESS',
-    settlement_date: null,
-    variance_reason: 'Chi phí phôi thép tăng nhẹ do phát sinh bù ca máy cắt'
+    acceptance_status: 'PENDING',
+    acceptance_date: null,
+    acceptance_notes: null,
+    materials_detail: [
+      {
+        material_code: 'VT-THEP-V50',
+        material_name: 'Thép góc V50x50x5mm',
+        unit: 'Cây',
+        norm_qty: 20.0,
+        actual_issued_qty: 23.0,
+        variance_qty: 3.0,
+        variance_pct: 15.0,
+        unit_price: 245000.0,
+        actual_cost: 5635000.0,
+        is_over_budget: true,
+        warning_reason: 'Cắt bù 3 cây do máy CNC kẹt bàn đẩy làm hỏng phôi'
+      }
+    ],
+    labor_detail: [
+      {
+        work_order_code: 'LSX-2026-002',
+        stage_name: 'Cắt phôi thép',
+        shift_count: 4,
+        total_man_hours: 64.0,
+        hourly_rate: 50000.0,
+        labor_cost: 3200000.0
+      }
+    ],
+    warnings: [
+      'Phát sinh vượt định mức 3 cây thép V50 do sự cố kẹt máy cắt CNC.',
+      'Biên lợi nhuận dự kiến giảm 1.5% so với báo giá ban đầu.'
+    ]
   },
   {
-    id: 3,
+    id: 'DA-2026-003',
     project_id: 'DA-2026-003',
+    project_code: 'DA-2026-003',
     project_name: 'Lan can Inox Khách sạn Riverside',
     customer_name: 'Tập đoàn Riverside',
+    customer_phone: '0903332211',
     contract_value: 220000000.0,
+    estimated_cost: 150000000.0,
     actual_material_cost: 110000000.0,
     actual_labor_cost: 45000000.0,
     actual_subcontractor_cost: 10000000.0,
-    total_cost: 165000000.0,
+    actual_other_cost: 10000000.0,
+    total_actual_cost: 165000000.0,
     gross_profit: 55000000.0,
+    profit_margin_pct: 25.0,
     margin_pct: 25.0,
+    amount_paid: 150000000.0,
+    remaining_receivable: 70000000.0,
     status: 'IN_PROGRESS',
-    settlement_date: null,
-    variance_reason: 'Tiến độ đang bám sát dự toán'
+    acceptance_status: 'PENDING',
+    acceptance_date: null,
+    acceptance_notes: null,
+    materials_detail: [
+      {
+        material_code: 'VT-INOX-304',
+        material_name: 'Tấm Inox 304 xước dày 1.5mm',
+        unit: 'Tấm',
+        norm_qty: 10.0,
+        actual_issued_qty: 10.0,
+        variance_qty: 0.0,
+        variance_pct: 0.0,
+        unit_price: 850000.0,
+        actual_cost: 8500000.0,
+        is_over_budget: false
+      }
+    ],
+    labor_detail: [
+      {
+        work_order_code: 'LSX-2026-003',
+        stage_name: 'Uốn cong nghệ thuật',
+        shift_count: 2,
+        total_man_hours: 36.0,
+        hourly_rate: 50000.0,
+        labor_cost: 1800000.0
+      }
+    ],
+    warnings: []
   }
 ];
 
@@ -338,27 +528,52 @@ let aiSettings = [
   }
 ];
 
-// AI Audit Logs
+// AI Audit Logs (Matches AIAuditResponse schema with module_name and cost_usd)
 let aiAuditLogs = [
   {
-    id: 1,
+    id: 'AUD-001',
+    module_name: 'INVENTORY_OCR',
     feature_key: 'INVENTORY_OCR',
+    user_id: 'thukho',
+    project_id: 'DA-2026-002',
     action_type: 'OCR_PARSE',
     input_text: 'Hóa đơn GTGT số 0045231 Công ty CP Thép Hòa Phát',
     parsed_output: { items: 2, total: 42750000 },
     confidence_score: 0.94,
     is_modified: false,
-    created_at: '2026-10-28T10:15:00Z'
+    cost_usd: 0.0025,
+    latency_ms: 650,
+    created_at: new Date(Date.now() - 3600000 * 2).toISOString()
   },
   {
-    id: 2,
+    id: 'AUD-002',
+    module_name: 'PRODUCTION_LOG',
     feature_key: 'PRODUCTION_LOG',
+    user_id: 'totruong',
+    project_id: 'DA-2026-002',
     action_type: 'TEXT_STANDARDIZATION',
     input_text: 'Tổ 1 cắt được 5 cây dầm thì máy cắt trục trặc',
     parsed_output: { wo: 'LSX-2026-002', qty: 5, stage: 'Cắt' },
     confidence_score: 0.96,
     is_modified: false,
-    created_at: '2026-10-28T11:45:00Z'
+    cost_usd: 0.0018,
+    latency_ms: 480,
+    created_at: new Date(Date.now() - 3600000 * 4).toISOString()
+  },
+  {
+    id: 'AUD-003',
+    module_name: 'BOQ_EXTRACTION',
+    feature_key: 'BOQ_EXTRACTION',
+    user_id: 'kythuat',
+    project_id: 'DA-2026-001',
+    action_type: 'BOQ_PARSE',
+    input_text: 'Bản vẽ cổng nhôm đúc 4 cánh hoa văn rồng CAD',
+    parsed_output: { materials_found: 4, confidence: 0.92 },
+    confidence_score: 0.92,
+    is_modified: true,
+    cost_usd: 0.0042,
+    latency_ms: 1200,
+    created_at: new Date(Date.now() - 86400000).toISOString()
   }
 ];
 
@@ -385,14 +600,9 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     return NextResponse.json(users);
   }
 
-  // 4. Materials
+  // 4. Materials (Returns Array to match FastAPI List[MaterialResponse])
   if (path === 'materials') {
-    return NextResponse.json({
-      items: materials,
-      total: materials.length,
-      page: 1,
-      limit: 200
-    });
+    return NextResponse.json(materials);
   }
 
   // 5. Norms
@@ -417,7 +627,6 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
 
   // 9. Inventory Alerts
   if (path === 'inventory/alerts') {
-    const lowStock = materials.filter(m => m.current_stock < m.min_stock_alert);
     return NextResponse.json({
       alerts: [
         {
@@ -475,11 +684,11 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     const pCode = slug[1];
     const s = settlements.find(it => it.project_id === pCode) || settlements[0];
     return NextResponse.json({
-      project_code: s.project_id,
+      project_code: s.project_code,
       project_name: s.project_name,
       contract_value: s.contract_value,
       gross_profit: s.gross_profit,
-      margin_pct: s.margin_pct,
+      profit_margin_pct: s.profit_margin_pct,
       misa_export_status: 'EXPORTED_XML_READY',
       export_timestamp: new Date().toISOString()
     });
@@ -558,11 +767,11 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     if (raw.includes('002') || raw.toLowerCase().includes('dầm')) {
       wo = 'LSX-2026-002';
       qty = 5.0;
-      stage = 'Cắt phôi';
+      stage = 'Cắt';
     } else if (raw.includes('003') || raw.toLowerCase().includes('lan can')) {
       wo = 'LSX-2026-003';
       qty = 10.0;
-      stage = 'Hàn hoàn thiện';
+      stage = 'Hàn';
     }
 
     return NextResponse.json({
@@ -700,7 +909,8 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     const target = settlements.find(s => s.project_id === pCode);
     if (target) {
       target.status = 'FINALIZED';
-      target.settlement_date = new Date().toISOString().split('T')[0];
+      target.acceptance_status = 'ACCEPTED';
+      target.acceptance_date = new Date().toISOString().split('T')[0];
     }
     return NextResponse.json({ message: 'Quyết toán thành công', settlement: target });
   }

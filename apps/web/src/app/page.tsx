@@ -193,7 +193,10 @@ export default function AppHome() {
       const res = await fetch(`${API_BASE}/api/v1/materials?limit=200`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) setMaterials(await res.json());
+      if (res.ok) {
+        const data = await res.json();
+        setMaterials(Array.isArray(data) ? data : (data.items || []));
+      }
     } catch (err) {
       console.error(err);
     }
@@ -226,7 +229,10 @@ export default function AppHome() {
       const res = await fetch(`${API_BASE}/api/v1/ai-audit?limit=50`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) setAuditLogs(await res.json());
+      if (res.ok) {
+        const data = await res.json();
+        setAuditLogs(Array.isArray(data) ? data : (data.items || []));
+      }
     } catch (err) {
       console.error(err);
     }
@@ -608,7 +614,7 @@ export default function AppHome() {
                       <div className="panel" style={{ padding: '20px', background: 'var(--raised)' }}>
                         <p style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase' }}>KẾT LUẬN ĐIỀU HÀNH HÔM NAY</p>
                         <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginTop: '4px', color: 'var(--text)' }}>
-                          {dailySummary.director_summary.one_sentence_takeaway}
+                          {dailySummary.director_summary?.one_sentence_takeaway || 'Mọi đơn hàng đang bám sát tiến độ cam kết.'}
                         </h3>
                       </div>
 
@@ -616,26 +622,26 @@ export default function AppHome() {
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
                         <div className="card-glass" style={{ padding: '18px' }}>
                           <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>ĐƠN ĐANG CHẠY</p>
-                          <p style={{ fontSize: '1.6rem', fontWeight: 800, color: '#f8fafc', marginTop: '4px' }}>
-                            {dailySummary.director_summary.kpis.total_active_orders}
+                          <p style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text)', marginTop: '4px' }}>
+                            {dailySummary.director_summary?.kpis?.total_active_orders || 0}
                           </p>
                         </div>
                         <div className="card-glass" style={{ padding: '18px' }}>
                           <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>NGUY CƠ TRỄ HẠN</p>
                           <p style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--negative)', marginTop: '4px' }}>
-                            {dailySummary.director_summary.kpis.delayed_risk_count}
+                            {dailySummary.director_summary?.kpis?.delayed_risk_count || 0}
                           </p>
                         </div>
                         <div className="card-glass" style={{ padding: '18px' }}>
                           <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>SẢN LƯỢNG HÔM NAY</p>
                           <p style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--positive)', marginTop: '4px' }}>
-                            {dailySummary.director_summary.kpis.today_units_completed} sản phẩm
+                            {dailySummary.director_summary?.kpis?.today_units_completed || 0} sản phẩm
                           </p>
                         </div>
                         <div className="card-glass" style={{ padding: '18px' }}>
                           <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>TỔNG GIÁ TRỊ XƯỞNG ĐANG LÀM</p>
                           <p style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent)', marginTop: '4px' }}>
-                            {formatVND(dailySummary.director_summary.kpis.estimated_wip_value)}
+                            {formatVND(dailySummary.director_summary?.kpis?.estimated_wip_value || 0)}
                           </p>
                         </div>
                       </div>
@@ -647,7 +653,7 @@ export default function AppHome() {
                             <AlertTriangle size={18} /> Cảnh báo rủi ro nghiêm trọng:
                           </h4>
                           <ul style={{ paddingLeft: '18px', color: 'var(--text-main)', fontSize: '0.85rem', lineHeight: '1.8' }}>
-                            {dailySummary.director_summary.critical_alerts.map((al: string, i: number) => (
+                            {(dailySummary.director_summary?.critical_alerts || []).map((al: string, i: number) => (
                               <li key={i}>{al}</li>
                             ))}
                           </ul>
@@ -658,7 +664,7 @@ export default function AppHome() {
                             <CheckCircle2 size={18} /> Mục chờ Giám đốc duyệt nhanh:
                           </h4>
                           <ul style={{ paddingLeft: '18px', color: 'var(--text-main)', fontSize: '0.85rem', lineHeight: '1.8' }}>
-                            {dailySummary.director_summary.waiting_approval.map((wa: string, i: number) => (
+                            {(dailySummary.director_summary?.waiting_approval || []).map((wa: string, i: number) => (
                               <li key={i}>{wa}</li>
                             ))}
                           </ul>
@@ -682,12 +688,12 @@ export default function AppHome() {
                             </tr>
                           </thead>
                           <tbody>
-                            {Object.entries(dailySummary.tech_summary.stages).map(([stage, info]: [string, any]) => (
+                            {Object.entries(dailySummary.tech_summary?.stages || {}).map(([stage, info]: [string, any]) => (
                               <tr key={stage}>
                                 <td style={{ fontWeight: 700, color: 'var(--accent)' }}>{stage}</td>
-                                <td style={{ fontWeight: 800, color: 'var(--positive)' }}>{info.qty}</td>
-                                <td>{info.hours} giờ</td>
-                                <td>{info.workers} thợ</td>
+                                <td style={{ fontWeight: 800, color: 'var(--positive)' }}>{info?.qty || 0}</td>
+                                <td>{info?.hours || 0} giờ</td>
+                                <td>{info?.workers || 0} thợ</td>
                                 <td><span className="badge badge-green">Hoạt động</span></td>
                               </tr>
                             ))}
@@ -695,13 +701,13 @@ export default function AppHome() {
                         </table>
                       </div>
 
-                      {dailySummary.tech_summary.reported_issues.length > 0 && (
+                      {(dailySummary.tech_summary?.reported_issues || []).length > 0 && (
                         <div className="card-glass" style={{ padding: '20px' }}>
                           <h4 style={{ color: 'var(--negative)', fontSize: '0.9rem', fontWeight: 600, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <AlertTriangle size={16} /> Báo cáo sự cố từ các tổ trưởng:
                           </h4>
                           <ul style={{ paddingLeft: '18px', color: 'var(--text-main)', fontSize: '0.85rem', lineHeight: '1.8' }}>
-                            {dailySummary.tech_summary.reported_issues.map((iss: any, i: number) => (
+                            {(dailySummary.tech_summary?.reported_issues || []).map((iss: any, i: number) => (
                               <li key={i}>
                                 <b>{iss.work_order}</b> ({iss.foreman}): {iss.issue}
                               </li>
@@ -732,7 +738,7 @@ export default function AppHome() {
                               </tr>
                             </thead>
                             <tbody>
-                              {dailySummary.sales_summary.ready_to_dispatch.map((item: any, i: number) => (
+                              {(dailySummary.sales_summary?.ready_to_dispatch || []).map((item: any, i: number) => (
                                 <tr key={i}>
                                   <td style={{ fontWeight: 700 }}>{item.customer}</td>
                                   <td style={{ color: 'var(--accent)' }}>{item.phone}</td>
@@ -763,7 +769,7 @@ export default function AppHome() {
                               </tr>
                             </thead>
                             <tbody>
-                              {dailySummary.sales_summary.need_customer_call.map((item: any, i: number) => (
+                              {(dailySummary.sales_summary?.need_customer_call || []).map((item: any, i: number) => (
                                 <tr key={i}>
                                   <td style={{ fontWeight: 700 }}>{item.customer}</td>
                                   <td style={{ color: 'var(--accent)' }}>{item.phone}</td>
@@ -870,7 +876,7 @@ export default function AppHome() {
                     </tr>
                   </thead>
                   <tbody>
-                    {materials.filter(m => m.code.toLowerCase().includes(materialSearch.toLowerCase()) || m.name.toLowerCase().includes(materialSearch.toLowerCase())).map((m) => (
+                    {(Array.isArray(materials) ? materials : []).filter(m => (m.code || '').toLowerCase().includes(materialSearch.toLowerCase()) || (m.name || '').toLowerCase().includes(materialSearch.toLowerCase())).map((m) => (
                       <tr key={m.id}>
                         <td style={{ fontWeight: 700, color: 'var(--accent)' }}>{m.code}</td>
                         <td style={{ fontWeight: 600 }}>{m.name}</td>
@@ -1002,13 +1008,13 @@ export default function AppHome() {
                     </tr>
                   </thead>
                   <tbody>
-                    {auditLogs.map((log) => (
+                    {(Array.isArray(auditLogs) ? auditLogs : []).map((log) => (
                       <tr key={log.id}>
-                        <td style={{ fontWeight: 600, color: 'var(--accent)' }}>{log.module_name}</td>
-                        <td>{log.user_id}</td>
+                        <td style={{ fontWeight: 600, color: 'var(--accent)' }}>{log.module_name || log.feature_key || 'AI_MODULE'}</td>
+                        <td>{log.user_id || 'system'}</td>
                         <td>
-                          <span className={log.confidence_score >= 0.9 ? 'badge badge-green' : 'badge badge-amber'}>
-                            {(log.confidence_score * 100).toFixed(0)}%
+                          <span className={(log.confidence_score ?? 1) >= 0.9 ? 'badge badge-green' : 'badge badge-amber'}>
+                            {((log.confidence_score ?? 1) * 100).toFixed(0)}%
                           </span>
                         </td>
                         <td>
@@ -1018,9 +1024,9 @@ export default function AppHome() {
                             <span className="badge badge-green">Giữ nguyên AI</span>
                           )}
                         </td>
-                        <td style={{ color: 'var(--positive)', fontWeight: 600 }}>${log.cost_usd.toFixed(4)}</td>
+                        <td style={{ color: 'var(--positive)', fontWeight: 600 }}>${(log.cost_usd || 0).toFixed(4)}</td>
                         <td style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>
-                          {new Date(log.created_at).toLocaleString('vi-VN')}
+                          {log.created_at ? new Date(log.created_at).toLocaleString('vi-VN') : ''}
                         </td>
                       </tr>
                     ))}
