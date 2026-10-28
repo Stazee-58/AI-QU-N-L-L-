@@ -1,6 +1,13 @@
+import os
+import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+# Đảm bảo import được packages
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
 from app.config import settings
 from app.api.v1 import api_v1_router
 from app.seed import seed_all_data
