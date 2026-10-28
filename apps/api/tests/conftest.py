@@ -81,3 +81,9 @@ async def sales_token(client: AsyncClient):
     resp = await client.post("/api/v1/auth/login", json={"username": "kinhdoanh", "password": "Sales@123456"})
     assert resp.status_code == 200
     return resp.json()["access_token"]
+
+@pytest_asyncio.fixture
+async def warehouse_token(client: AsyncClient):
+    resp = await client.post("/api/v1/auth/login", json={"username": "thukho", "password": "Warehouse@123456"})
+    assert resp.status_code == 200
+    return resp.json()["access_token"]

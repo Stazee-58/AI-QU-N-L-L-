@@ -16,5 +16,6 @@ class Material(Base):
     standard_price: Mapped[float] = mapped_column(Numeric(15, 2), default=0.0, nullable=False)
     min_stock_alert: Mapped[float] = mapped_column(Numeric(12, 2), default=0.0, nullable=False)
     current_stock: Mapped[float] = mapped_column(Numeric(12, 2), default=0.0, nullable=False)
+    last_movement_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))

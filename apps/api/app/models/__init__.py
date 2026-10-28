@@ -8,6 +8,8 @@ from app.models.ai_audit import AIAudit
 from app.models.ai_settings import AISetting
 from app.models.work_order import WorkOrder
 from app.models.production_log import ProductionLog
+from app.models.purchase_order import PurchaseOrder
+from app.models.inventory_transaction import InventoryTransaction
 
 __all__ = [
     "Base",
@@ -20,4 +22,6 @@ __all__ = [
     "AISetting",
     "WorkOrder",
     "ProductionLog",
+    "PurchaseOrder",
+    "InventoryTransaction",
 ]

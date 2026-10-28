@@ -8,6 +8,7 @@ from app.api.v1.ai_settings import router as ai_settings_router
 from app.api.v1.ai_audit import router as ai_audit_router
 from app.api.v1.projects import router as projects_router
 from app.api.v1.production import router as production_router
+from app.api.v1.inventory import router as inventory_router
 
 api_v1_router = APIRouter(prefix="/api/v1")
 api_v1_router.include_router(auth_router)
@@ -19,3 +20,4 @@ api_v1_router.include_router(ai_settings_router)
 api_v1_router.include_router(ai_audit_router)
 api_v1_router.include_router(projects_router)
 api_v1_router.include_router(production_router)
+api_v1_router.include_router(inventory_router)

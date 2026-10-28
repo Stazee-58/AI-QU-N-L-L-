@@ -15,7 +15,7 @@ class WorkOrderBase(BaseModel):
     status: str = "IN_PROGRESS"
     risk_level: str = "NORMAL"  # NORMAL, WARNING, CRITICAL
     risk_reason: Optional[str] = None
-    bom_snapshot: Dict[str, Any] = {}
+    bom_snapshot: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
 class WorkOrderCreate(WorkOrderBase):
     pass

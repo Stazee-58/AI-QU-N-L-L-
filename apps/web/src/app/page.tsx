@@ -11,6 +11,8 @@ import ImportExcelModal from '../components/ImportExcelModal';
 import AddUserModal from '../components/AddUserModal';
 import EditMaterialModal from '../components/EditMaterialModal';
 import ForemanMobileView from '../components/ForemanMobileView';
+import WarehouseView from '../components/WarehouseView';
+import { Boxes } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -26,7 +28,7 @@ export default function AppHome() {
 
   // Tabs
   const [activeTab, setActiveTab] = useState<
-    'work_orders' | 'daily_reports' | 'foreman_mobile' | 'materials' | 'norms' | 'ai_settings' | 'ai_audit' | 'users'
+    'work_orders' | 'daily_reports' | 'foreman_mobile' | 'warehouse' | 'materials' | 'norms' | 'ai_settings' | 'ai_audit' | 'users'
   >('work_orders');
 
   // Sub-tab cho 3 phiên bản báo cáo
@@ -69,6 +71,7 @@ export default function AppHome() {
     if (token) {
       if (activeTab === 'work_orders') loadWorkOrders();
       if (activeTab === 'daily_reports') loadDailySummary();
+      if (activeTab === 'warehouse') loadMaterials();
       if (activeTab === 'users') loadUsers();
       if (activeTab === 'materials') loadMaterials();
       if (activeTab === 'norms') loadNorms();
@@ -402,6 +405,14 @@ export default function AppHome() {
 
           <button onClick={() => setActiveTab('foreman_mobile')} className={activeTab === 'foreman_mobile' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'foreman_mobile' ? 'none' : '1px solid transparent', background: activeTab === 'foreman_mobile' ? undefined : 'transparent' }}>
             <Smartphone size={16} /> ĐT Tổ Trưởng (3 Chạm)
+          </button>
+
+          <p style={{ fontSize: '0.7rem', color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '14px 8px 6px', fontWeight: 600 }}>
+            Kho & Vật tư (G3)
+          </p>
+
+          <button onClick={() => setActiveTab('warehouse')} className={activeTab === 'warehouse' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'warehouse' ? 'none' : '1px solid transparent', background: activeTab === 'warehouse' ? undefined : 'transparent' }}>
+            <Boxes size={16} /> Phiếu Nhập / Xuất Kho
           </button>
 
           <p style={{ fontSize: '0.7rem', color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '14px 8px 6px', fontWeight: 600 }}>
@@ -767,6 +778,15 @@ export default function AppHome() {
                 }}
               />
             </div>
+          )}
+
+          {/* TAB: KHO & VẬT TƯ (G3) */}
+          {activeTab === 'warehouse' && (
+            <WarehouseView 
+              token={token}
+              currentUser={currentUser}
+              materialsCatalog={materials}
+            />
           )}
 
           {/* TAB: VẬT TƯ */}
