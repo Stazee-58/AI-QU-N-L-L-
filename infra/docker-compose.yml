@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: caulong_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: caulong_user
+      POSTGRES_PASSWORD: caulong_secret_2026
+      POSTGRES_DB: caulong_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U caulong_user -d caulong_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: caulong_minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: caulong_admin
+      MINIO_ROOT_PASSWORD: caulong_minio_secret_2026
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.api
+    container_name: caulong_api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://caulong_user:caulong_secret_2026@postgres:5432/caulong_db
+      SYNC_DATABASE_URL: postgresql://caulong_user:caulong_secret_2026@postgres:5432/caulong_db
+      SECRET_KEY: change-this-to-a-super-secret-key-at-least-32-chars-long-2026
+      ENVIRONMENT: production
+    ports:
+      - "8000:8000"
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.web
+    container_name: caulong_web
+    restart: always
+    depends_on:
+      - api
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  minio_data:

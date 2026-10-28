@@ -1,0 +1,88 @@
+{
+  "app": {
+    "title": "Hệ thống Vận hành Sản xuất & Thi công",
+    "company": "CẬU LONG ENTERPRISE",
+    "subtitle": "Đơn hàng - Xưởng - Kho - Thi công - Quyết toán",
+    "help_button": "Trợ giúp & Hướng dẫn"
+  },
+  "auth": {
+    "login_title": "Đăng nhập Hệ thống",
+    "username": "Tên đăng nhập",
+    "password": "Mật khẩu",
+    "login_button": "Đăng nhập ngay",
+    "logout_button": "Đăng xuất",
+    "invalid_credentials": "Tên đăng nhập hoặc mật khẩu không chính xác.",
+    "role_badge": "Vai trò"
+  },
+  "nav": {
+    "dashboard": "Tổng quan",
+    "users": "Quản lý Người dùng",
+    "materials": "Danh mục Vật tư & Giá",
+    "norms": "Định mức Sản xuất (BOM)",
+    "ai_settings": "Cài đặt & Quyền AI",
+    "ai_audit": "Nhật ký Đối soát AI"
+  },
+  "users": {
+    "title": "Quản lý Nhân sự & Phân quyền",
+    "add_user": "Thêm người dùng mới",
+    "search_placeholder": "Tìm kiếm theo tên, username, số điện thoại...",
+    "col_username": "Tên đăng nhập",
+    "col_fullname": "Họ và tên",
+    "col_role": "Vai trò",
+    "col_phone": "Số điện thoại",
+    "col_status": "Trạng thái",
+    "status_active": "Đang hoạt động",
+    "status_inactive": "Đã khóa",
+    "action_edit": "Sửa",
+    "action_deactivate": "Khóa tài khoản"
+  },
+  "materials": {
+    "title": "Danh mục Vật tư & Bảng giá Chuẩn",
+    "add_material": "Thêm vật tư",
+    "import_excel": "Nhập từ Excel / CSV",
+    "download_template": "Tải file mẫu Excel",
+    "search_placeholder": "Tìm theo mã, tên vật tư, quy cách...",
+    "col_code": "Mã vật tư",
+    "col_name": "Tên vật tư",
+    "col_spec": "Quy cách kỹ thuật",
+    "col_unit": "ĐVT",
+    "col_category": "Nhóm vật tư",
+    "col_price": "Đơn giá chuẩn (VNĐ)",
+    "col_min_stock": "Tồn tối thiểu",
+    "col_current_stock": "Tồn thực tế",
+    "edit_title": "Chỉnh sửa Vật tư & Đơn giá"
+  },
+  "norms": {
+    "title": "Định mức Tiêu hao Sản xuất (BOM)",
+    "add_norm": "Tạo định mức mới",
+    "col_name": "Tên định mức / Sản phẩm",
+    "col_type": "Nhóm sản phẩm",
+    "col_unit": "Đơn vị tính",
+    "col_labor_hours": "Giờ công / Đơn vị",
+    "col_version": "Phiên bản"
+  },
+  "ai_settings": {
+    "title": "Cấu hình Mức Quyền & Công tắc Ngắt AI Khẩn cấp",
+    "subtitle": "Admin kiểm soát toàn quyền: Gợi ý (Mức 1), Làm rồi duyệt (Mức 2), Tự chạy (Mức 3).",
+    "col_feature": "Chức năng AI",
+    "col_level": "Mức quyền vận hành",
+    "col_status": "Công tắc khẩn cấp",
+    "col_budget": "Hạn mức tháng ($)",
+    "col_cost": "Chi phí đã dùng ($)",
+    "level_1": "Mức 1: Gợi ý (AI chỉ đề xuất)",
+    "level_2": "Mức 2: Làm rồi duyệt (Cần người bấm duyệt)",
+    "level_3": "Mức 3: Tự chạy (Không liên quan tiền)",
+    "switch_enabled": "Đang bật",
+    "switch_disabled": "Đã ngắt khẩn cấp"
+  },
+  "ai_audit": {
+    "title": "Nhật ký Đối soát AI & Sửa đổi của Con người (Bất biến)",
+    "col_module": "Module",
+    "col_user": "Người thực hiện",
+    "col_confidence": "Độ tin cậy AI",
+    "col_modified": "Người có sửa không?",
+    "col_time": "Thời điểm",
+    "was_modified": "Có chỉnh sửa",
+    "not_modified": "Nguyên bản AI"
+  }
+}
