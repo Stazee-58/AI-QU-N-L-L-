@@ -252,19 +252,78 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
         </div>
       )}
 
-      {/* CHẠM 1: NHẬP TIN NHẮN TỰ DO / NÓI */}
+      {/* CHẠM 1: NHẬP TIN NHẮN TỰ DO / NÓI HOẶC CHẠM CHIPS NHANH (SỬA LỖI VƯỚNG) */}
       {step === 'INPUT' && (
-        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
-          <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
-            Nhắn tin tự nhiên như trên Zalo/Telegram:
+        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+          <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text)' }}>
+            Nhắn tin hoặc chạm nhanh các nút bên dưới:
           </p>
+
+          {/* Chips Lệnh sản xuất đang chạy */}
+          <div>
+            <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+              ⚡ 1. Chạm chọn Lệnh sản xuất:
+            </span>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {[
+                { label: 'LSX-001 (Cổng nhôm)', val: 'LSX-2026-001 cổng nhôm' },
+                { label: 'LSX-002 (Khung dầm)', val: 'LSX-2026-002 khung dầm thép' },
+                { label: 'LSX-003 (Lan can)', val: 'LSX-2026-003 lan can inox' },
+              ].map((chip, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setRawText(prev => prev ? `${prev} ${chip.val}` : `Tổ 1 làm ${chip.val}`)}
+                  style={{
+                    fontSize: '0.7rem',
+                    padding: '3px 8px',
+                    borderRadius: '12px',
+                    border: '1px solid var(--accent)',
+                    background: 'var(--surface)',
+                    color: 'var(--accent)',
+                    cursor: 'pointer',
+                    fontWeight: 600
+                  }}
+                >
+                  +{chip.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Chips Công đoạn */}
+          <div>
+            <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+              ⚡ 2. Chạm chọn Công đoạn:
+            </span>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {['Cắt phôi xong 20c', 'Hàn xong 15 bộ', 'Sơn phủ 2 bộ', 'Lắp ráp xong 4 thợ'].map((act, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setRawText(prev => prev ? `${prev} ${act}` : act)}
+                  style={{
+                    fontSize: '0.7rem',
+                    padding: '3px 8px',
+                    borderRadius: '12px',
+                    border: '1px solid var(--border)',
+                    background: 'var(--raised)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {act}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <textarea 
             className="form-input" 
-            rows={4}
+            rows={3}
             value={rawText} 
             onChange={(e) => setRawText(e.target.value)}
             placeholder="vd: to 1 cat xog 40c thep v5 da cau long co 4 tho..."
-            style={{ fontSize: '0.875rem', lineHeight: '1.5' }}
+            style={{ fontSize: '0.85rem', lineHeight: '1.4' }}
             autoFocus
           />
 

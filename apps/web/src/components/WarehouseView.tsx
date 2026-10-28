@@ -809,6 +809,34 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                                 <span style={{ fontSize: '0.65rem', color: 'var(--faint)', display: 'block', textAlign: 'right' }}>
                                   Tin cậy: ({(it.confidence_price * 100).toFixed(0)}%)
                                 </span>
+                                {it.confidence_price < 0.70 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const mat = materialsCatalog.find(m => m.code === it.material_code);
+                                      const std = mat ? parseFloat(mat.standard_price) : 245000;
+                                      handleUpdateItemField(idx, 'unit_price', std);
+                                      it.confidence_price = 0.95;
+                                      it.flag_reason = null;
+                                    }}
+                                    style={{
+                                      marginTop: '4px',
+                                      fontSize: '0.65rem',
+                                      background: '#fee2e2',
+                                      border: '1px solid #ef4444',
+                                      color: '#991b1b',
+                                      padding: '2px 4px',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer',
+                                      width: '100%',
+                                      fontWeight: 600,
+                                      display: 'block'
+                                    }}
+                                    title="Sửa lỗi nhanh cho thủ kho mới: Bấm 1 chạm để áp giá chuẩn"
+                                  >
+                                    ⚡ Áp giá chuẩn ({materialsCatalog.find(m => m.code === it.material_code)?.standard_price ? Number(materialsCatalog.find(m => m.code === it.material_code)?.standard_price).toLocaleString('vi-VN') : '245,000'}đ)
+                                  </button>
+                                )}
                               </td>
 
                               {/* Cột 4: Thành tiền */}
@@ -1335,3 +1363,4 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
     </div>
   );
 }
+

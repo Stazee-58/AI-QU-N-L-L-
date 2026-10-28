@@ -12,7 +12,10 @@ import AddUserModal from '../components/AddUserModal';
 import EditMaterialModal from '../components/EditMaterialModal';
 import ForemanMobileView from '../components/ForemanMobileView';
 import WarehouseView from '../components/WarehouseView';
-import { Boxes } from 'lucide-react';
+import SettlementView from '../components/SettlementView';
+import ExecutiveDashboardView from '../components/ExecutiveDashboardView';
+import SandboxTrainingView from '../components/SandboxTrainingView';
+import { Boxes, FileCheck2, GraduationCap, LayoutDashboard } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -28,8 +31,8 @@ export default function AppHome() {
 
   // Tabs
   const [activeTab, setActiveTab] = useState<
-    'work_orders' | 'daily_reports' | 'foreman_mobile' | 'warehouse' | 'materials' | 'norms' | 'ai_settings' | 'ai_audit' | 'users'
-  >('work_orders');
+    'executive_dashboard' | 'work_orders' | 'daily_reports' | 'foreman_mobile' | 'warehouse' | 'settlements' | 'sandbox' | 'materials' | 'norms' | 'ai_settings' | 'ai_audit' | 'users'
+  >('executive_dashboard');
 
   // Sub-tab cho 3 phiên bản báo cáo
   const [reportVersion, setReportVersion] = useState<'director' | 'tech' | 'sales'>('director');
@@ -392,6 +395,18 @@ export default function AppHome() {
           gap: '4px'
         }}>
           <p style={{ fontSize: '0.7rem', color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 8px 6px', fontWeight: 600 }}>
+            Tổng Quản & Sát Hạch (G6)
+          </p>
+
+          <button onClick={() => setActiveTab('executive_dashboard')} className={activeTab === 'executive_dashboard' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'executive_dashboard' ? 'none' : '1px solid transparent', background: activeTab === 'executive_dashboard' ? undefined : 'transparent' }}>
+            <LayoutDashboard size={16} /> Dashboard Điều Hành
+          </button>
+
+          <button onClick={() => setActiveTab('sandbox')} className={activeTab === 'sandbox' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'sandbox' ? 'none' : '1px solid transparent', background: activeTab === 'sandbox' ? undefined : 'transparent' }}>
+            <GraduationCap size={16} /> Sandbox & Sát Hạch
+          </button>
+
+          <p style={{ fontSize: '0.7rem', color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '14px 8px 6px', fontWeight: 600 }}>
             Điều hành Xưởng (G2)
           </p>
 
@@ -413,6 +428,14 @@ export default function AppHome() {
 
           <button onClick={() => setActiveTab('warehouse')} className={activeTab === 'warehouse' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'warehouse' ? 'none' : '1px solid transparent', background: activeTab === 'warehouse' ? undefined : 'transparent' }}>
             <Boxes size={16} /> Phiếu Nhập / Xuất Kho
+          </button>
+
+          <p style={{ fontSize: '0.7rem', color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '14px 8px 6px', fontWeight: 600 }}>
+            Nghiệm Thu & Quyết Toán (G5)
+          </p>
+
+          <button onClick={() => setActiveTab('settlements')} className={activeTab === 'settlements' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'settlements' ? 'none' : '1px solid transparent', background: activeTab === 'settlements' ? undefined : 'transparent' }}>
+            <FileCheck2 size={16} /> Quyết Toán Dự Án
           </button>
 
           <p style={{ fontSize: '0.7rem', color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '14px 8px 6px', fontWeight: 600 }}>
@@ -780,12 +803,38 @@ export default function AppHome() {
             </div>
           )}
 
+          {/* TAB: EXECUTIVE DASHBOARD (G6) */}
+          {activeTab === 'executive_dashboard' && (
+            <ExecutiveDashboardView 
+              token={token}
+              currentUser={currentUser}
+              onNavigateTab={(tab) => setActiveTab(tab)}
+            />
+          )}
+
+          {/* TAB: SANDBOX & SÁT HẠCH (G6) */}
+          {activeTab === 'sandbox' && (
+            <SandboxTrainingView 
+              token={token}
+              currentUser={currentUser}
+              onNavigateTab={(tab) => setActiveTab(tab)}
+            />
+          )}
+
           {/* TAB: KHO & VẬT TƯ (G3) */}
           {activeTab === 'warehouse' && (
             <WarehouseView 
               token={token}
               currentUser={currentUser}
               materialsCatalog={materials}
+            />
+          )}
+
+          {/* TAB: QUYẾT TOÁN & NGHIỆM THU (G5) */}
+          {activeTab === 'settlements' && (
+            <SettlementView 
+              token={token}
+              currentUser={currentUser}
             />
           )}
 

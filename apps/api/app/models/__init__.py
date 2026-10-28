@@ -10,6 +10,7 @@ from app.models.work_order import WorkOrder
 from app.models.production_log import ProductionLog
 from app.models.purchase_order import PurchaseOrder
 from app.models.inventory_transaction import InventoryTransaction
+from app.models.settlement import ProjectSettlement
 
 __all__ = [
     "Base",
@@ -24,4 +25,5 @@ __all__ = [
     "ProductionLog",
     "PurchaseOrder",
     "InventoryTransaction",
+    "ProjectSettlement",
 ]
