@@ -142,22 +142,22 @@ export default function ExecutiveDashboardView({ token, currentUser, onNavigateT
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '24px' }}>
         
         {/* Doanh số & Lãi gộp */}
-        <div className="card" style={{ padding: '18px', borderLeft: '4px solid var(--positive)' }}>
-          <span style={{ fontSize: '0.7rem', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 }}>Tài Chính & Lợi Nhuận Dự Án</span>
-          <p style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--positive)', marginTop: '4px' }}>
+        <div className="card" style={{ padding: '18px' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--muted)', fontWeight: 600 }}>Tài chính & Lợi nhuận dự án</span>
+          <p style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--positive)', marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
             {formatVND(stats.totalGrossProfit)}
           </p>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '6px', color: 'var(--muted)' }}>
             <span>Doanh thu: {formatVND(stats.totalContractValue)}</span>
-            <span style={{ fontWeight: 700, color: 'var(--positive)' }}>Biên lãi: {stats.avgMarginPct}%</span>
+            <span style={{ fontWeight: 600, color: 'var(--positive)' }}>Biên lãi: {stats.avgMarginPct}%</span>
           </div>
         </div>
 
         {/* Tiến độ sản xuất */}
-        <div className="card" style={{ padding: '18px', borderLeft: '4px solid var(--accent)' }}>
-          <span style={{ fontSize: '0.7rem', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 }}>Tiến Độ Sản Xuất Xưởng</span>
-          <p style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text)', marginTop: '4px' }}>
-            3 / 3 Lệnh Đang Chạy
+        <div className="card" style={{ padding: '18px' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--muted)', fontWeight: 600 }}>Tiến độ sản xuất xưởng</span>
+          <p style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text)', marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
+            3 / 3 Lệnh đang chạy
           </p>
           <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
             <span className="pill neg" style={{ fontSize: '0.65rem' }}>1 Quá hạn</span>
@@ -167,10 +167,10 @@ export default function ExecutiveDashboardView({ token, currentUser, onNavigateT
         </div>
 
         {/* Tồn kho & Đọng vốn */}
-        <div className="card" style={{ padding: '18px', borderLeft: '4px solid var(--warning)' }}>
-          <span style={{ fontSize: '0.7rem', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 }}>Cảnh Báo Vật Tư Kho</span>
-          <p style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--warning)', marginTop: '4px' }}>
-            2 Vật Tư Dưới An Toàn
+        <div className="card" style={{ padding: '18px' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--muted)', fontWeight: 600 }}>Cảnh báo vật tư kho</span>
+          <p style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--warning)', marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
+            2 Vật tư dưới an toàn
           </p>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '6px', color: 'var(--muted)' }}>
             <span>1 Mặt hàng tồn &gt; 45 ngày</span>
@@ -179,9 +179,9 @@ export default function ExecutiveDashboardView({ token, currentUser, onNavigateT
         </div>
 
         {/* Ngân sách AI & An toàn */}
-        <div className="card" style={{ padding: '18px', borderLeft: '4px solid #6366f1' }}>
-          <span style={{ fontSize: '0.7rem', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 }}>Chi Phí AI & Kiểm Soát</span>
-          <p style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text)', marginTop: '4px' }}>
+        <div className="card" style={{ padding: '18px' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--muted)', fontWeight: 600 }}>Chi phí AI & Kiểm soát</span>
+          <p style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text)', marginTop: '4px', fontVariantNumeric: 'tabular-nums' }}>
             ${stats.aiMonthlySpentUsd.toFixed(2)} / ${stats.aiBudgetUsd.toFixed(2)}
           </p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
@@ -217,8 +217,8 @@ export default function ExecutiveDashboardView({ token, currentUser, onNavigateT
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '12px 14px',
-                  background: setting.is_enabled ? 'var(--surface)' : '#fef2f2',
-                  border: `1px solid ${setting.is_enabled ? 'var(--border)' : '#f87171'}`,
+                  background: setting.is_enabled ? 'var(--surface)' : 'var(--pill-negative-bg)',
+                  border: `1px solid ${setting.is_enabled ? 'var(--border)' : 'var(--negative)'}`,
                   borderRadius: 'var(--radius-control)'
                 }}
               >
@@ -317,3 +317,4 @@ export default function ExecutiveDashboardView({ token, currentUser, onNavigateT
     </div>
   );
 }
+

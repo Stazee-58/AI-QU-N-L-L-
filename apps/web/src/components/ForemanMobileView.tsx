@@ -262,7 +262,7 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
           {/* Chips Lệnh sản xuất đang chạy */}
           <div>
             <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
-              ⚡ 1. Chạm chọn Lệnh sản xuất:
+              1. Chạm chọn Lệnh sản xuất:
             </span>
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
               {[
@@ -294,7 +294,7 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
           {/* Chips Công đoạn */}
           <div>
             <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
-              ⚡ 2. Chạm chọn Công đoạn:
+              2. Chạm chọn Công đoạn:
             </span>
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
               {['Cắt phôi xong 20c', 'Hàn xong 15 bộ', 'Sơn phủ 2 bộ', 'Lắp ráp xong 4 thợ'].map((act, idx) => (

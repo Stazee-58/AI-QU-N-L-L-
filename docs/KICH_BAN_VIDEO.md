@@ -45,3 +45,4 @@
 | **01:15 - 01:50** | Xem lãi gộp 840 triệu (biên lãi 67.2%) và công nợ khách hàng. | *"Tại đây, Kế toán và Giám đốc biết chính xác Lãi gộp thực tế của đơn hàng, tiền khách đã cọc và số tiền còn lại phải thu khi bàn giao."* |
 | **01:50 - 02:20** | Điền đánh giá "ĐẠT CHUẨN 100%", bấm nút **"Chốt Nghiệm Thu & Khóa Sổ Quyết Toán"**. | *"Khi khách hàng ký biên bản bàn giao, Kế toán bấm 'Chốt Nghiệm Thu'. Toàn bộ chi phí được khóa sổ bất biến và tự động xuất file đối soát chuẩn MISA."* |
 | **02:20 - 02:30** | File quyết toán xuất ra màn hình. Kết thúc. | *"Minh bạch, chống thất thoát và bảo vệ biên lợi nhuận của xưởng."* |
+

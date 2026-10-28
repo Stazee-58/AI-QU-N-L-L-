@@ -198,8 +198,8 @@ export default function SandboxTrainingView({ token, currentUser, onNavigateTab 
               <p style={{ fontWeight: 700, marginBottom: '4px' }}>Mục tiêu nhiệm vụ:</p>
               <p style={{ color: 'var(--muted)', lineHeight: 1.4 }}>{selectedExercise.description}</p>
               <div style={{ display: 'flex', gap: '16px', marginTop: '10px', fontSize: '0.75rem' }}>
-                <span>🎯 Giới hạn thao tác: <b>&le; {selectedExercise.max_operations} lần chạm</b></span>
-                <span>⏱️ Thời gian tiêu chuẩn: <b>&le; {selectedExercise.target_time_seconds} giây</b></span>
+                <span>Giới hạn thao tác: <b>&le; {selectedExercise.max_operations} lần chạm</b></span>
+                <span>Thời gian tiêu chuẩn: <b>&le; {selectedExercise.target_time_seconds} giây</b></span>
               </div>
             </div>
 
@@ -320,3 +320,4 @@ export default function SandboxTrainingView({ token, currentUser, onNavigateTab 
     </div>
   );
 }
+

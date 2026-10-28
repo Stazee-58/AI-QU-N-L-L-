@@ -148,3 +148,4 @@ async def test_g6_sandbox_exercises_and_auto_grader(client: AsyncClient, warehou
     reset_resp = await client.post("/api/v1/sandbox/reset", headers=headers)
     assert reset_resp.status_code == 200
     assert "khôi phục" in reset_resp.json()["message"].lower()
+

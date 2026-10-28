@@ -48,3 +48,4 @@ class ProjectSettlement(Base):
 
     project = relationship("Project", foreign_keys=[project_id], lazy="joined")
     finalized_by = relationship("User", foreign_keys=[finalized_by_id], lazy="joined")
+

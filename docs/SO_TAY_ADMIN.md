@@ -84,3 +84,4 @@ docker-compose -f infra/docker-compose.yml exec -T db pg_dump -U caulong caulong
 cat /backup/caulong_db_20261028.sql | docker-compose -f infra/docker-compose.yml exec -T db psql -U caulong -d caulong_db
 ```
 Thời gian khôi phục hoàn chỉnh: dưới 3 phút.
+

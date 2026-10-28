@@ -335,7 +335,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
             <Boxes size={22} style={{ color: 'var(--accent)' }} /> Quản lý Kho & Trích xuất Phiếu Thông minh (G3)
           </h2>
           <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
-            Chụp ảnh phiếu nhập/xuất ➔ OCR tự động ➔ Đối chiếu PO/LSX ➔ Ghi thẻ kho trong &le; 3 thao tác
+            Chụp ảnh phiếu nhập/xuất &rarr; OCR tự động &rarr; Đối chiếu PO/LSX &rarr; Ghi thẻ kho trong &le; 3 thao tác
           </p>
         </div>
 
@@ -822,9 +822,9 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                                     style={{
                                       marginTop: '4px',
                                       fontSize: '0.65rem',
-                                      background: '#fee2e2',
-                                      border: '1px solid #ef4444',
-                                      color: '#991b1b',
+                                      background: 'var(--pill-negative-bg)',
+                                      border: '1px solid var(--negative)',
+                                      color: 'var(--pill-negative-ink)',
                                       padding: '2px 4px',
                                       borderRadius: '4px',
                                       cursor: 'pointer',
@@ -834,7 +834,7 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
                                     }}
                                     title="Sửa lỗi nhanh cho thủ kho mới: Bấm 1 chạm để áp giá chuẩn"
                                   >
-                                    ⚡ Áp giá chuẩn ({materialsCatalog.find(m => m.code === it.material_code)?.standard_price ? Number(materialsCatalog.find(m => m.code === it.material_code)?.standard_price).toLocaleString('vi-VN') : '245,000'}đ)
+                                    Áp giá chuẩn ({materialsCatalog.find(m => m.code === it.material_code)?.standard_price ? Number(materialsCatalog.find(m => m.code === it.material_code)?.standard_price).toLocaleString('vi-VN') : '245,000'}đ)
                                   </button>
                                 )}
                               </td>
@@ -1347,17 +1347,17 @@ export default function WarehouseView({ token, currentUser, materialsCatalog }: 
       <style jsx global>{`
         .ocr-cell-green {
           border: 1px solid var(--border) !important;
-          background: #f8fafc;
+          background: var(--surface) !important;
         }
         .ocr-cell-yellow {
-          border: 1px solid #eab308 !important;
-          background: #fef9c3 !important;
-          color: #854d0e !important;
+          border: 1px solid var(--warning) !important;
+          background: var(--pill-warning-bg) !important;
+          color: var(--pill-warning-ink) !important;
         }
         .ocr-cell-red {
-          border: 1px solid #ef4444 !important;
-          background: #fee2e2 !important;
-          color: #991b1b !important;
+          border: 1px solid var(--negative) !important;
+          background: var(--pill-negative-bg) !important;
+          color: var(--pill-negative-ink) !important;
         }
       `}</style>
     </div>

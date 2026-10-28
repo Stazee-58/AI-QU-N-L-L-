@@ -74,3 +74,4 @@
    - Nếu nhập thừa 450 cây: Lập một phiếu xuất điều chỉnh giảm 450 cây gắn mã tham chiếu của phiếu nhập sai.
    - Hoặc lập phiếu `ADJUSTMENT` điều chỉnh số tồn về đúng con số kiểm kê.
 3. **Đưa nhân sự mới vào Sandbox luyện tập lại**: Bấm vào tab **"Sandbox & Sát Hạch"**, yêu cầu làm lại Bài tập 1 cho đến khi đạt điểm $\ge 80/100$.
+

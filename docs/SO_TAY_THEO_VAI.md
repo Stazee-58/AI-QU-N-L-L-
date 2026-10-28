@@ -84,3 +84,4 @@
    - Nhập số tiền khách đã thanh toán, chọn trạng thái `ĐẠT CHUẨN 100%`.
    - Bấm **"Chốt Nghiệm Thu & Khóa Sổ Quyết Toán"**: Hồ sơ chuyển sang `FINALIZED`, dự án chuyển sang `COMPLETED`, lưu trữ snapshot bất biến.
    - Bấm **"Xuất Báo Cáo Quyết Toán"** để gửi file bảng tính đối soát cho khách hàng hoặc nhập vào phần mềm kế toán.
+

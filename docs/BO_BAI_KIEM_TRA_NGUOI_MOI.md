@@ -91,3 +91,4 @@
 | **90 - 100 điểm** | **XUẤT SẮC** | Cấp tài khoản chính thức, vận hành độc lập không cần người kèm cặp. |
 | **75 - 89 điểm** | **ĐẠT YÊU CẦU** | Cấp tài khoản chính thức, có tổ trưởng/kế toán trưởng hỗ trợ rà soát tuần đầu. |
 | **Dưới 75 điểm** | **CHƯA ĐẠT** | Thực hành lại trên Sandbox 03 lần và thi lại sau 48 giờ. |
+

@@ -318,3 +318,4 @@ async def finalize_project_settlement(
 
     await session.commit()
     return await calculate_project_settlement(session, project_id)
+
