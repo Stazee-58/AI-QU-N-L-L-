@@ -1,0 +1,353 @@
+================================================================================
+          HƯỚNG DẪN SỬ DỤNG VÀ CẤU HÌNH HỆ THỐNG CẬU LONG ENTERPRISE
+  (Hệ Thống Số Hóa Vận Hành Sản Xuất, Kho Vận, Quyết Toán & Trợ Lý AI Điều Hành)
+================================================================================
+Ngày phát hành: 28/10/2026
+Phiên bản: 2.0 (Toàn diện chu trình G1 -> G6)
+Kho lưu trữ mã nguồn: https://github.com/Stazee-58/AI-QU-N-L-L-.git
+
+
+--------------------------------------------------------------------------------
+MỤC LỤC
+--------------------------------------------------------------------------------
+PHẦN 1: GIỚI THIỆU TỔNG QUAN HỆ THỐNG
+PHẦN 2: HƯỚNG DẪN ĐIỀN API VÀ CẤU HÌNH MÔI TRƯỜNG (.ENV)
+PHẦN 3: DANH SÁCH TÀI KHOẢN VÀ 8 VAI TRÒ TRUY CẬP (RBAC)
+PHẦN 4: CHI TIẾT CÁC TÍNH NĂNG VÀ CÁCH DÙNG TỪNG PHÂN HỆ
+PHẦN 5: QUY TRÌNH VẬN HÀNH THỰC TẾ THEO NGÀY (DAILY WORKFLOW)
+PHẦN 6: CHẾ ĐỘ DỰ PHÒNG KHI TẮT AI (KILL-SWITCH COMPLIANCE)
+PHẦN 7: XỬ LÝ SỰ CỐ VÀ CÂU HỎI THƯỜNG GẶP (FAQ & TROUBLESHOOTING)
+
+
+================================================================================
+PHẦN 1: GIỚI THIỆU TỔNG QUAN HỆ THỐNG
+================================================================================
+Hệ thống Cậu Long Enterprise được thiết kế chuyên biệt cho các doanh nghiệp
+gia công cơ khí, nhôm đúc, kết cấu thép và sản xuất - lắp đặt công trình.
+Hệ thống kết nối toàn bộ dòng chảy dữ liệu từ khâu Báo giá đến Quyết toán:
+
+1. Báo giá & Dự án (G1): Quản lý danh mục vật tư, bảng giá chuẩn và định mức BOM.
+2. Điều hành Sản xuất (G2): Báo cáo ca thoại 3 chạm cho Tổ trưởng, tự động sinh
+   báo cáo điều hành 3 phiên bản (Giám đốc, Kỹ thuật, Kinh doanh).
+3. Quản lý Kho & Vật tư (G3): OCR quét phiếu thông minh trong <= 3 thao tác,
+   đối chiếu PO/LSX, ô nghi ngờ tô màu vàng/đỏ, 4 nhóm cảnh báo kho có nút "Xem nguồn",
+   gợi ý mua hàng theo đơn hàng.
+4. Nghiệm thu & Quyết toán (G5): So sánh thực tế vs dự toán, tính tỷ suất lợi nhuận
+   gộp (Gross Profit Margin), chốt khóa sổ và xuất file XML sang phần mềm MISA.
+5. Đóng gói Bàn giao & Sát hạch (G6): Dashboard điều hành tổng hợp, Sandbox luyện
+   tập thực tế kèm hệ thống chấm điểm tự động cho nhân sự mới.
+
+Hệ thống tuân thủ nghiêm ngặt nguyên tắc:
+- Không AI slop: Giao diện Framed Sheet, tương phản cao, tối giản 1px viền,
+  tuyệt đối không sử dụng icon/emoji trang trí rườm rà.
+- Đơn giản cho tuyến đầu: Thủ kho, công nhân hoàn tất tác vụ trong <= 3 thao tác.
+- Kiểm soát & Minh bạch: Mọi gợi ý hay cảnh báo của AI đều có bằng chứng nguồn
+  (Provenance ADR-004) và ghi nhật ký bất biến (AI Audit Trail).
+- Chạy thông suốt khi tắt AI: 100% nghiệp vụ nhập/xuất/báo ca đều có chế độ nhập tay.
+
+
+================================================================================
+PHẦN 2: HƯỚNG DẪN ĐIỀN API VÀ CẤU HÌNH MÔI TRƯỜNG (.ENV)
+================================================================================
+Hệ thống hỗ trợ 2 chế độ triển khai:
+
+--------------------------------------------------------------------------------
+CHẾ ĐỘ 1: TRIỂN KHAI NHANH TRÊN VERCEL (STANDALONE MOCK ENGINE SẴN CÓ)
+--------------------------------------------------------------------------------
+- Hệ thống đã tích hợp sẵn Mock Serverless API tại đường dẫn:
+  `apps/web/src/app/api/v1/[...slug]/route.ts`
+- Ở chế độ này, bạn KHÔNG CẦN cài đặt cơ sở dữ liệu PostgreSQL hay máy chủ Python.
+  Toàn bộ dữ liệu mẫu, OCR phiếu kho giả lập, tính toán quyết toán, báo cáo 3 bản
+  và chấm điểm Sandbox hoạt động 100% trực tiếp trên trình duyệt và Vercel.
+
+* Cách cấu hình trên Vercel:
+  Bước 1: Import Repository GitHub `https://github.com/Stazee-58/AI-QU-N-L-L-.git`.
+  Bước 2: Trong phần Build & Development Settings:
+          - Root Directory: `apps/web` (hoặc để trống nếu build root).
+          - Build Command: `next build`
+          - Output Directory: `.next`
+  Bước 3: Phần Environment Variables trên Vercel:
+          - `NEXT_PUBLIC_API_URL`: Để TRỐNG (hệ thống sẽ tự nhận route nội bộ `/api/v1`).
+          - Bấm "Deploy". Trang web sẵn sàng chạy ngay 100%.
+
+--------------------------------------------------------------------------------
+CHẾ ĐỘ 2: FULL-STACK PRODUCTION (FASTAPI + POSTGRESQL + GOOGLE GEMINI AI THẬT)
+--------------------------------------------------------------------------------
+Khi muốn kết nối cơ sở dữ liệu thật và sử dụng mô hình trí tuệ nhân tạo Gemini
+để nhận diện hình ảnh/giọng nói thực tế:
+
+1. Cấu hình Backend API (`infra/.env` hoặc `apps/api/.env`):
+   Tạo file `.env` từ file mẫu `infra/.env.example`:
+
+   ```env
+   # Tên hệ thống
+   PROJECT_NAME="Hệ thống Vận hành Sản xuất & Thi công Cậu Long"
+   ENVIRONMENT=production
+
+   # Cơ sở dữ liệu PostgreSQL 16
+   DATABASE_URL=postgresql+asyncpg://caulong_user:caulong_secret_2026@localhost:5432/caulong_db
+   SYNC_DATABASE_URL=postgresql://caulong_user:caulong_secret_2026@localhost:5432/caulong_db
+
+   # Bảo mật và Token đăng nhập
+   SECRET_KEY=khoa-bi-mat-jwt-it-nhat-32-ky-tu-ngau-nhien-caulong-2026
+   ALGORITHM=HS256
+   ACCESS_TOKEN_EXPIRE_MINUTES=1440
+
+   # CẤU HÌNH GOOGLE GEMINI API KEY:
+   # Lấy khóa miễn phí hoặc trả phí tại: https://aistudio.google.com/app/apikey
+   GEMINI_API_KEY=AIzaSyD_dien_api_key_cua_ban_vao_day_xxxxxxxx
+
+   # Quản lý Ngân sách AI (Tự động ngắt khi vượt hạn mức)
+   DEFAULT_AI_PROVIDER=gemini
+   AI_MONTHLY_BUDGET_USD=50.0
+   AI_BUDGET_ALERT_THRESHOLD=0.8
+   ```
+
+2. Cấu hình Frontend Web (`apps/web/.env.local` hoặc Vercel Env):
+   ```env
+   # Trỏ Frontend tới địa chỉ của Backend FastAPI
+   NEXT_PUBLIC_API_URL=http://localhost:8000
+   ```
+   (Nếu triển khai backend lên Render / Railway / VPS, điền domain backend vào đây:
+   ví dụ: `NEXT_PUBLIC_API_URL=https://api-caulong.onrender.com`)
+
+3. Lệnh khởi chạy Docker toàn bộ hệ thống (1 dòng lệnh):
+   ```bash
+   cd infra
+   docker-compose up -d --build
+   ```
+   Hệ thống sẽ tự động bật:
+   - PostgreSQL (Port 5432)
+   - Backend FastAPI (Port 8000)
+   - Frontend Web Next.js (Port 3000)
+
+
+================================================================================
+PHẦN 3: DANH SÁCH TÀI KHOẢN VÀ 8 VAI TRÒ TRUY CẬP (RBAC)
+================================================================================
+Hệ thống thiết lập sẵn 8 tài khoản mẫu đại diện cho 8 mắt xích trong chuỗi vận hành.
+Tại màn hình Đăng nhập (`/`), có sẵn thanh bấm chọn nhanh vai trò (1-chạm)
+hoặc nhập thủ công tên đăng nhập dưới đây:
+
+Mật khẩu chung cho tất cả tài khoản mẫu: `Admin@123456` (hoặc bất kỳ mật khẩu nào)
+
++----+-------------+------------------------------------+-------------------------------------------+
+| STT| Username    | Chức Danh / Vai Trò                | Nhiệm Vụ Chính Trong Hệ Thống             |
++----+-------------+------------------------------------+-------------------------------------------+
+| 1  | admin       | Quản trị viên hệ thống             | Toàn quyền: Cài đặt AI, Quản lý tài khoản |
+| 2  | director    | Giám đốc / Ban điều hành           | Xem Dashboard tổng quan, Báo cáo điều hành|
+| 3  | kinhdoanh   | Nhân viên Kinh doanh & Dự án       | Báo giá, xem BOQ, theo dõi đơn sẵn sàng   |
+| 4  | kythuat     | Kỹ thuật / Điều hành xưởng         | Bóc tách BOM, thiết lập định mức, LSX     |
+| 5  | totruong    | Quản đốc / Tổ trưởng xưởng         | Báo ca mobile qua giọng nói, báo hỏng máy |
+| 6  | thukho      | Thủ kho                            | Quét OCR phiếu nhập/xuất, thẻ kho, vật tư |
+| 7  | thicong     | Điều phối / Thi công lắp đặt       | Biên bản bàn giao, nhật trình công trường |
+| 8  | ketoan      | Kế toán trưởng & Quyết toán        | Đối chiếu chi phí thực vs dự toán, MISA   |
++----+-------------+------------------------------------+-------------------------------------------+
+
+
+================================================================================
+PHẦN 4: CHI TIẾT CÁC TÍNH NĂNG VÀ CÁCH DÙNG TỪNG PHÂN HỆ
+================================================================================
+
+--------------------------------------------------------------------------------
+1. DASHBOARD ĐIỀU HÀNH TỔNG THỂ (TAB: "DASHBOARD ĐIỀU HÀNH" - G6)
+--------------------------------------------------------------------------------
+- Mục đích: Cung cấp bức tranh toàn cảnh thời gian thực cho Giám đốc và Quản lý.
+- Các chỉ số trọng yếu:
+  + Tỷ suất lợi nhuận gộp trung bình (Gross Profit Margin %) của toàn bộ các dự án.
+  + Giá trị sản phẩm dở dang (WIP - Work in Progress) đang nằm tại xưởng.
+  + Đơn hàng có rủi ro (Quá hạn cam kết hoặc thiếu hụt vật tư).
+  + Chi phí AI trong tháng và mức tiêu hao ngân sách thực tế.
+- Thao tác: Bấm vào từng thẻ chỉ số để nhảy nhanh tới chi tiết từng phân hệ xử lý.
+
+--------------------------------------------------------------------------------
+2. SANDBOX & SÁT HẠCH NGƯỜI MỚI (TAB: "SANDBOX & SÁT HẠCH" - G6)
+--------------------------------------------------------------------------------
+- Mục đích: Đào tạo nhân viên mới (Thủ kho, Tổ trưởng, Kế toán) trực tiếp trên
+  môi trường thực hành có dữ liệu giả lập an toàn, không lo sai hỏng số liệu thật.
+- Tính năng tự động chấm điểm:
+  + Đếm chính xác số bước thao tác chuột/bàn phím của nhân sự.
+  + Bấm giờ hoàn thành bài tập theo giây.
+  + So sánh kết quả: Nếu hoàn tất đúng yêu cầu trong <= 3 thao tác sẽ được xếp loại
+    "XUẤT SẮC" (Đạt chuẩn sát hạch).
+- Các bài tập mẫu:
+  + EX-WH-01: Thủ kho xử lý hóa đơn Hòa Phát lệch giá >40% và bấm áp giá chuẩn.
+  + EX-FM-01: Tổ trưởng báo cáo ca qua giọng nói bằng điện thoại di động.
+  + EX-AC-01: Kế toán kiểm tra biên độ lợi nhuận và xuất file XML cho MISA.
+
+--------------------------------------------------------------------------------
+3. TIẾN ĐỘ LỆNH SẢN XUẤT (TAB: "TIẾN ĐỘ LỆNH SẢN XUẤT" - G2)
+--------------------------------------------------------------------------------
+- Mục đích: Giám sát từng lệnh sản xuất (LSX) đang chạy tại xưởng.
+- Nhận diện rủi ro tự động:
+  + ĐỎ (CRITICAL - Quá hạn): Đơn hàng đã vượt quá ngày hẹn giao hàng.
+  + VÀNG (WARNING - Nguy cơ trễ): Đơn hàng chỉ còn <= 2 ngày nhưng tiến độ chưa đạt 50%.
+  + XANH (NORMAL): Đúng tiến độ dự kiến.
+- Chi tiết lệnh: Xem rõ tỷ lệ hoàn thành (%), ngày bắt đầu/kết thúc, tổ trưởng phụ trách,
+  và bảng bóc tách nguyên vật liệu (BOM) cần dùng.
+
+--------------------------------------------------------------------------------
+4. BÁO CÁO ĐIỀU HÀNH 3 PHIÊN BẢN (TAB: "BÁO CÁO ĐIỀU HÀNH" - G2)
+--------------------------------------------------------------------------------
+- Mục đích: Thay vì bắt mọi người đọc chung một bảng số liệu khô khan, hệ thống tự động
+  chia thành 3 bản báo cáo chuyên biệt vào mỗi đầu ca sáng và cuối ca chiều:
+  1. Bản Giám đốc:
+     - Tóm tắt cốt lõi trong đúng 1 câu.
+     - Các việc khẩn cấp cần Giám đốc ký duyệt (Duyệt giá, duyệt xuất vượt định mức).
+  2. Bản Kỹ thuật & Quản đốc xưởng:
+     - Thống kê sản lượng thực tế theo 5 công đoạn: Cắt, Hàn, Sơn, Lắp ráp, Đóng gói.
+     - Danh sách sự cố máy móc được ghi nhận (Kẹt máy cắt CNC, hỏng que hàn...).
+  3. Bản Kinh doanh & Dự án:
+     - Danh sách đơn hàng đã xong, sẵn sàng xuất kho để Kinh doanh gọi hẹn giao.
+     - Danh sách đơn trễ hạn để Kinh doanh chủ động gọi xin lỗi và gia hạn với khách.
+- Thao tác: Bấm nút "Tổng hợp Lại Hôm Nay" để cập nhật dữ liệu mới nhất.
+
+--------------------------------------------------------------------------------
+5. ĐIỆN THOẠI TỔ TRƯỞNG XƯỞNG (TAB: "ĐT TỔ TRƯỞNG (3 CHẠM)" - G2)
+--------------------------------------------------------------------------------
+- Thiết kế cho di động: Giao diện nút bấm to, chữ rõ ràng, dùng tốt tại môi trường xưởng bụi bặm.
+- Thao tác 3 chạm cực nhanh:
+  + Chạm 1: Bấm nút "Mẫu báo ca nhanh" (hoặc bấm biểu tượng Micro để nói).
+  + Chạm 2: Trợ lý AI tự động chuẩn hóa câu nói thành: Mã đơn hàng, Công đoạn, Sản lượng, Sự cố.
+  + Chạm 3: Bấm nút "Xác Nhận & Gửi Nhật Ký Ca".
+
+--------------------------------------------------------------------------------
+6. KHO & PHIẾU NHẬP XUẤT THÔNG MINH (TAB: "PHIẾU NHẬP / XUẤT KHO" - G3)
+--------------------------------------------------------------------------------
+Phân hệ gồm 4 tiểu mục (Sub-tabs):
+
+A. Quét Phiếu OCR Thông Minh (Quy trình 3 Thao Tác):
+   - Thao tác 1 (Chọn phiếu): Chọn trong danh sách mẫu hóa đơn thật (Hòa Phát, Jotun, Đại Nam)
+     hoặc chụp ảnh hóa đơn thực tế qua Camera điện thoại.
+   - Thao tác 2 (Đối chiếu Side-by-Side):
+     + Cột trái: Hiển thị bản mô phỏng phiếu gốc hoặc ảnh chụp.
+     + Cột phải: Bảng số liệu AI đã trích xuất.
+     + Các ô nghi ngờ tự động tô màu:
+       * VÀNG (Độ tin cậy 70% - 89%): Chữ viết tay mờ hoặc số lượng cần đếm lại.
+       * ĐỎ (Độ tin cậy < 70%): Đơn giá bị đội lệch >30% so với catalog chuẩn.
+     + Nút "Áp giá chuẩn catalog": Bấm 1 chạm để tự động hạ về giá mua tiêu chuẩn.
+   - Thao tác 3 (Lưu sổ): Bấm "Xác nhận Ghi Thẻ Kho" để ghi nhận và cập nhật tồn kho.
+
+B. Chế độ Nhập Tay Thủ Công (Dự phòng khi tắt AI):
+   - Biểu mẫu nhập tay đầy đủ: Số phiếu, loại nhập/xuất, chọn mã vật tư catalog, số lượng, đơn giá.
+   - Đảm bảo xưởng không bị đình trệ kể cả khi mất mạng internet hay ngắt kết nối AI.
+
+C. 4 Nhóm Cảnh Báo Kho Tự Động & Gợi Ý Mua Hàng:
+   - 4 loại cảnh báo:
+     1. Thiếu hàng cấp cho Lệnh sản xuất.
+     2. Xuất vật tư vượt định mức BOM thiết kế.
+     3. Lệch tồn kho giữa kiểm kê thực tế và sổ sách.
+     4. Vật tư tồn kho đọng lâu > 45 ngày chưa dùng.
+   - Nút "Xem nguồn" (Provenance): Mở cửa sổ truy vết chứng cứ chi tiết (Căn cứ phiếu số mấy,
+     ngày nào, ai xuất, chênh lệch bao nhiêu).
+   - Gợi ý mua hàng: Đề xuất số lượng cần mua, tính tổng tiền ước tính, hiển thị số điện thoại
+     nhà cung cấp kèm nút "Bấm để gọi điện ngay".
+
+D. Lịch Sử Giao Dịch Kho (Thẻ Kho):
+   - Bảng tra cứu thời gian thực tất cả các phiếu nhập/xuất, mã dự án liên kết, độ tin cậy AI.
+
+--------------------------------------------------------------------------------
+7. QUYẾT TOÁN DỰ ÁN & NGHIỆM THU (TAB: "QUYẾT TOÁN DỰ ÁN" - G5)
+--------------------------------------------------------------------------------
+- Mục đích: Giúp Kế toán và Giám đốc nắm rõ lời/lỗ thực tế của từng dự án trước khi nghiệm thu.
+- Đối chiếu 4 cấu phần chi phí:
+  + Chi phí Vật tư: Thống kê chính xác từng cây thép, thùng sơn đã thực xuất từ thẻ kho.
+  + Chi phí Nhân công: Tổng hợp từ nhật trình làm việc của thợ xưởng và lắp đặt.
+  + Chi phí Thầu phụ: Các hạng mục gia công ngoài (mạ kẽm, uốn vòm nghệ thuật).
+  + Chi phí Khác: Vận chuyển, cẩu hàng, vật tư phụ.
+- Tự động tính: Tổng chi phí thực tế, Lợi nhuận gộp (VNĐ), Biên lợi nhuận gộp (% Margin).
+- Nút "Hoàn tất quyết toán & Khóa sổ": Chuyển trạng thái dự án thành ĐÃ QUYẾT TOÁN.
+- Nút "Xuất XML Kế toán MISA": Tải về file dữ liệu XML chuẩn để nạp trực tiếp vào phần mềm
+  MISA SME / MISA AMIS, loại bỏ hoàn toàn việc kế toán phải nhập tay lại từng hóa đơn.
+
+--------------------------------------------------------------------------------
+8. QUẢN TRỊ NỀN TẢNG & KIỂM SOÁT AI (G1 & SYSTEM)
+--------------------------------------------------------------------------------
+- Tab "Vật tư & Bảng giá": Quản lý danh mục vật tư tiêu chuẩn, giá mua gốc, đơn vị tính.
+- Tab "Định mức (BOM)": Thiết lập mức tiêu hao vật tư cho từng mét vuông/bộ sản phẩm.
+- Tab "Cài đặt & Quyền AI":
+  + Công tắc an toàn (Kill-Switch): Cho phép Admin bật hoặc tắt độc lập từng tính năng AI
+    (OCR phiếu kho, Báo ca giọng nói, Báo cáo điều hành).
+  + Cài đặt ngân sách chi phí AI theo tháng (USD) và ngưỡng cảnh báo an toàn.
+- Tab "Nhật ký Đối soát AI": Lưu vết bất biến (Audit Log) mọi thao tác AI: nội dung người dùng đưa vào,
+  kết quả AI trả ra, độ trễ xử lý (ms), chi phí tính bằng USD.
+- Tab "Quản lý Người dùng": Thêm tài khoản mới, phân quyền truy cập, khóa tài khoản vi phạm.
+
+
+================================================================================
+PHẦN 5: QUY TRÌNH VẬN HÀNH THỰC TẾ THEO NGÀY (DAILY WORKFLOW)
+================================================================================
+Một ngày làm việc mẫu sử dụng hệ thống Cậu Long Enterprise:
+
+- 07:30 SÁNG:
+  Giám đốc đăng nhập tài khoản `director` -> Vào tab "Báo Cáo Điều Hành", đọc bản tin 1 câu
+  dành riêng cho Giám đốc để biết hôm nay đơn hàng nào có nguy cơ trễ hạn.
+
+- 08:30 SÁNG:
+  Xe hàng của Thép Hòa Phát giao đến xưởng -> Thủ kho đăng nhập `thukho` -> Vào tab "Phiếu
+  Nhập / Xuất Kho" -> Chụp ảnh phiếu giao hàng -> Hệ thống trích xuất OCR, thủ kho kiểm tra
+  ô tô màu và bấm "Xác nhận Ghi Thẻ Kho" (xong trong 30 giây).
+
+- 11:30 TRƯA:
+  Hết ca sáng, Tổ trưởng đăng nhập `totruong` trên điện thoại di động -> Vào tab "ĐT Tổ Trưởng"
+  -> Bấm Micro nói: "Tổ 1 cắt xong 5 cây dầm LSX-002, máy cắt kẹt 45 phút" -> Bấm xác nhận gửi.
+
+- 14:00 CHIỀU:
+  Kỹ thuật vào tab "Phiếu Nhập Xuất Kho" -> Xem mục "Gợi ý Mua hàng Phục vụ LSX" -> Bấm gọi điện
+  cho Nhà cung cấp Sơn Jotun để đặt bổ sung 10 thùng sơn đang thiếu hụt.
+
+- 16:30 CHIỀU:
+  Khách hàng nghiệm thu công trình Biệt thự Cậu Long -> Kế toán đăng nhập `ketoan` -> Mở tab
+  "Quyết Toán Dự Án" -> Xem bảng so sánh vật tư thực tế vs dự toán -> Bấm "Hoàn tất quyết toán"
+  -> Bấm "Xuất XML Kế toán MISA" để lưu sổ sách kế toán thuế.
+
+
+================================================================================
+PHẦN 6: CHẾ ĐỘ DỰ PHÒNG KHI TẮT AI (KILL-SWITCH COMPLIANCE)
+================================================================================
+Hệ thống được thiết kế theo tiêu chuẩn an toàn công nghiệp cấp doanh nghiệp:
+
+1. Cách ngắt AI khẩn cấp:
+   - Quản trị viên vào tab "Cài đặt & Quyền AI".
+   - Gạt tắt công tắc tại mục "INVENTORY_OCR" hoặc "PRODUCTION_LOG".
+   - Ngay lập tức, tính năng gọi tới mô hình trí tuệ nhân tạo sẽ bị chặn hoàn toàn.
+
+2. Trải nghiệm người dùng khi AI tắt:
+   - Khi thủ kho mở màn hình quét phiếu, hệ thống sẽ hiển thị thanh thông báo màu vàng:
+     "Công tắc An toàn AI đang TẮT - Vui lòng chuyển sang chế độ Nhập tay".
+   - Thủ kho bấm nút "Chuyển sang Nhập tay", form thủ công hiện ra và ghi thẻ kho bình thường.
+   - Đảm bảo tiến độ công việc tại nhà xưởng không bao giờ bị dừng lại do sự cố AI.
+
+
+================================================================================
+PHẦN 7: XỬ LÝ SỰ CỐ VÀ CÂU HỎI THƯỜNG GẶP (FAQ & TROUBLESHOOTING)
+================================================================================
+
+Hỏi: Khi truy cập website thấy thông báo "Application error: a client-side exception has occurred"?
+Đáp: Lỗi này xảy ra do trình duyệt còn lưu cache của phiên bản cũ.
+     Cách khắc phục: Nhấn tổ hợp phím `Ctrl + F5` (hoặc `Cmd + Shift + R` trên Mac) để xóa cache
+     và tải phiên bản mới nhất đã được vá lỗi 100%.
+
+Hỏi: Có bắt buộc phải mua tài khoản Google Gemini trả phí để dùng hệ thống không?
+Đáp: KHÔNG BẮT BUỘC.
+     - Nếu dùng bản demo trên Vercel: Hệ thống chạy sẵn Mock Engine, hoàn toàn miễn phí.
+     - Nếu dùng kết nối Gemini thật: Bạn có thể tạo khóa Gemini API Key miễn phí tại Google AI
+       Studio (hạn ngạch miễn phí 15 yêu cầu/phút, hoàn toàn đủ cho nhu cầu xưởng cơ khí vừa và nhỏ).
+
+Hỏi: Dữ liệu quyết toán xuất ra có tương thích với phần mềm MISA không?
+Đáp: CÓ. File xuất ra có định dạng XML chuẩn cấu trúc danh mục chứng từ của MISA SME và MISA AMIS,
+     cho phép bạn vào MISA chọn "Tệp" -> "Nhập khẩu từ XML" là dữ liệu tự động vào sổ cái.
+
+Hỏi: Muốn thêm một nhân viên mới vào xưởng thì làm như thế nào?
+Đáp: Đăng nhập bằng tài khoản `admin` -> Chọn tab "Quản lý Người dùng" -> Bấm nút "Thêm Người Dùng"
+     -> Điền tên, số điện thoại và chọn 1 trong 8 vai trò phù hợp -> Bấm "Tạo tài khoản".
+
+
+================================================================================
+THÔNG TIN HỖ TRỢ KỸ THUẬT
+================================================================================
+Hệ thống: Cậu Long Enterprise Management System
+Mã nguồn: https://github.com/Stazee-58/AI-QU-N-L-L-.git
+Nhánh chính thức: master
+Bản quyền: (c) 2026 Cậu Long Enterprise. All rights reserved.
+================================================================================
