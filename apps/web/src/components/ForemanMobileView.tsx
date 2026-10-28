@@ -19,7 +19,7 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
   const [clarificationAnswer, setClarificationAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
   // Chạm 1: Chọn mẫu báo nhanh hoặc nhập tin nhắn tự do
   const handleQuickPreset = (text: string) => {

@@ -33,7 +33,7 @@ export default function AddUserModal({ isOpen, onClose, token, roles, onUserAdde
     setIsSubmitting(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
       const res = await fetch(`${apiUrl}/api/v1/users`, {
         method: 'POST',
         headers: {

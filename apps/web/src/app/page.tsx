@@ -17,7 +17,7 @@ import ExecutiveDashboardView from '../components/ExecutiveDashboardView';
 import SandboxTrainingView from '../components/SandboxTrainingView';
 import { Boxes, FileCheck2, GraduationCap, LayoutDashboard } from 'lucide-react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export default function AppHome() {
   const [token, setToken] = useState<string | null>(null);

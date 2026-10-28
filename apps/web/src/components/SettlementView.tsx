@@ -11,7 +11,7 @@ interface SettlementViewProps {
 }
 
 export default function SettlementView({ token, currentUser }: SettlementViewProps) {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
   const [settlements, setSettlements] = useState<any[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);

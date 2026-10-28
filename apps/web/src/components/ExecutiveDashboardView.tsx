@@ -13,7 +13,7 @@ interface ExecutiveDashboardProps {
 }
 
 export default function ExecutiveDashboardView({ token, currentUser, onNavigateTab }: ExecutiveDashboardProps) {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
   const [stats, setStats] = useState({
     totalProjects: 3,

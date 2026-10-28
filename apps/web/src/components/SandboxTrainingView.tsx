@@ -12,7 +12,7 @@ interface SandboxTrainingProps {
 }
 
 export default function SandboxTrainingView({ token, currentUser, onNavigateTab }: SandboxTrainingProps) {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
   const [exercises, setExercises] = useState<any[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<any | null>(null);

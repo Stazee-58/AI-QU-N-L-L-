@@ -42,7 +42,7 @@ export default function ImportExcelModal({ isOpen, onClose, token, onImportSucce
 
   const handleDownloadTemplate = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
       const res = await fetch(`${apiUrl}/api/v1/materials/template`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -69,7 +69,7 @@ export default function ImportExcelModal({ isOpen, onClose, token, onImportSucce
     formData.append('file', file);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
       const res = await fetch(`${apiUrl}/api/v1/materials/import`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },

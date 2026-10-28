@@ -13,7 +13,7 @@ interface WarehouseViewProps {
 }
 
 export default function WarehouseView({ token, currentUser, materialsCatalog }: WarehouseViewProps) {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
   // Sub-tabs
   const [activeSubTab, setActiveSubTab] = useState<'ocr_scan' | 'manual_entry' | 'alerts_suggestions' | 'transactions_log'>('ocr_scan');
