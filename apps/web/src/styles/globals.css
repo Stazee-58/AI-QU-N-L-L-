@@ -1,96 +1,177 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+/* ==========================================================================
+   TASTESKILL v2 (Anti-Slop Design System)
+   Art Direction: Framed Sheet (Tailored for Cậu Long Manufacturing & Operations)
+   Rule Reference: references/app-screens.md
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --bg-primary: #0a0d14;
-  --bg-surface: #121722;
-  --bg-surface-elevated: #1a2233;
-  --bg-input: #0f141f;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-focus: #3b82f6;
-  
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
+  /* Chromes & Surfaces: One Tinted L-frame (#f9fbfc), White Work Sheet (#ffffff) */
+  --ground: #f8fafc;
+  --surface: #ffffff;
+  --raised: #f1f5f9;
+  --active: #e2e8f0;
+  --border: #e2e8f0;
+  --rule: #edf2f7;
+  --control: #cbd5e1;
+  --text: #0f172a;
+  --muted: #475569;
+  --faint: #64748b;
 
-  --accent-blue: #3b82f6;
-  --accent-blue-hover: #2563eb;
-  --accent-cyan: #06b6d4;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
+  /* Industrial Accent & Semantic Colours (Strictly non-slop, no violet/indigo) */
+  --accent: #0e7490;             /* Industrial mechanical cyan-teal */
+  --accent-hover: #155e75;
+  --primary: #0f172a;            /* Solid near-black primary action */
+  --primary-ink: #ffffff;
   
-  --glass-bg: rgba(18, 23, 34, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --shadow-glow: 0 0 25px -5px rgba(59, 130, 246, 0.25);
+  --positive: #15803d;
+  --negative: #b91c1c;
+  --warning: #b45309;
+
+  /* High-Contrast Accessible Status Pills (>= 4.5:1 ratio) */
+  --pill-positive-bg: #dcfce7;
+  --pill-positive-ink: #14532d;
+  --pill-negative-bg: #fee2e2;
+  --pill-negative-ink: #7f1d1d;
+  --pill-warning-bg: #fef3c7;
+  --pill-warning-ink: #78350f;
+  --pill-neutral-bg: #f1f5f9;
+  --pill-neutral-ink: #334155;
+
+  /* Geometry & Rhythm */
+  --radius-card: 8px;
+  --radius-control: 6px;
+  --radius-sheet: 14px;
+  --gap: 20px;
+  --card-pad: 20px;
+  --row-height: 44px;
+  --control-height: 34px;
+
+  /* Typography: Neo-grotesk with tabular figures */
+  --font-sans: 'IBM Plex Sans', -apple-system, system-ui, sans-serif;
+  --fs-title: 22px;
+  --fs-section: 15px;
+  --fs-kpi: 26px;
+  --fs-body: 14px;
+  --fs-small: 12px;
+
+  /* Motion & Feedback */
+  --t-press: 120ms;
+  --t-hover: 150ms;
+  --t-ui: 200ms;
 }
 
-* {
+/* Dark Theme Support (True Neutral Darks, Elevation by Lightness Alone) */
+:root[data-theme="dark"], body.dark-mode {
+  --ground: #0a0c10;
+  --surface: #12151c;
+  --raised: #1a1e28;
+  --active: #222734;
+  --border: #262c3a;
+  --rule: #1e232e;
+  --control: #384256;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --faint: #64748b;
+  --accent: #38bdf8;
+  --accent-hover: #7dd3fc;
+  --primary: #f8fafc;
+  --primary-ink: #0a0c10;
+  --positive: #4ade80;
+  --negative: #f87171;
+  --warning: #fbbf24;
+  --pill-positive-bg: #143220;
+  --pill-positive-ink: #4ade80;
+  --pill-negative-bg: #381a1d;
+  --pill-negative-ink: #f87171;
+  --pill-warning-bg: #322510;
+  --pill-warning-ink: #fbbf24;
+  --pill-neutral-bg: #1a1e28;
+  --pill-neutral-ink: #cbd5e1;
+}
+
+/* CSS Reset */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-sans);
-  background: var(--bg-primary);
-  color: var(--text-main);
+  background: var(--ground);
+  color: var(--text);
+  font-size: var(--fs-body);
+  line-height: 1.45;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  background-image: 
-    radial-gradient(at 10% 10%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
-    radial-gradient(at 90% 90%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
-  background-attachment: fixed;
 }
 
 button, input, select, textarea {
   font-family: inherit;
+  color: inherit;
 }
 
-/* Glassmorphism Cards */
-.card-glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* Tabular numbers for all quantitative figures */
+.num, table, .kpi-value, .mono {
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
 }
 
-.card-glass:hover {
-  border-color: rgba(255, 255, 255, 0.14);
+/* Card & Panels: Flat surfaces separated by a 1px hairline, NO shadows or glass blur */
+.card-glass, .panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--card-pad);
+  transition: border-color var(--t-hover) ease;
 }
 
-/* Data Table Styling */
+.card-glass:hover, .panel:hover {
+  border-color: var(--control);
+}
+
+/* Data Table Styling: Rules and alignment, sentence case headers */
 .data-table-container {
   overflow-x: auto;
-  border-radius: 12px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-surface);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.875rem;
+  font-size: var(--fs-body);
 }
 
 .data-table th {
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-muted);
-  font-weight: 600;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.75rem;
+  background: var(--raised);
+  color: var(--muted);
+  font-weight: 500;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  text-transform: none; /* Sentence case, no tracked uppercase */
+  font-size: var(--fs-small);
+  letter-spacing: 0;
 }
 
 .data-table td {
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border-subtle);
-  color: var(--text-main);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.data-table th.num, .data-table td.num {
+  text-align: right;
 }
 
 .data-table tr:last-child td {
@@ -98,126 +179,128 @@ button, input, select, textarea {
 }
 
 .data-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--raised);
 }
 
-/* Badges */
-.badge {
+/* Badges & Status Pills: High-contrast legible labels */
+.badge, .pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  line-height: 18px;
+  border: 1px solid transparent;
 }
 
-.badge-green {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+.badge-green, .pill.pos {
+  background: var(--pill-positive-bg);
+  color: var(--pill-positive-ink);
+  border-color: rgba(21, 128, 61, 0.2);
 }
 
-.badge-amber {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+.badge-amber, .pill.warn {
+  background: var(--pill-warning-bg);
+  color: var(--pill-warning-ink);
+  border-color: rgba(180, 83, 9, 0.2);
 }
 
-.badge-red {
-  background: rgba(244, 63, 94, 0.15);
-  color: #fb7185;
-  border: 1px solid rgba(244, 63, 94, 0.3);
+.badge-red, .pill.neg {
+  background: var(--pill-negative-bg);
+  color: var(--pill-negative-ink);
+  border-color: rgba(185, 28, 28, 0.2);
 }
 
-.badge-blue {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+.badge-blue, .pill.neutral {
+  background: var(--pill-neutral-bg);
+  color: var(--pill-neutral-ink);
+  border-color: var(--border);
 }
 
-/* Buttons */
+/* Buttons: Solid flat fills, NO gradients, NO shadows at rest */
 .btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: #ffffff;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.875rem;
+  background: var(--primary);
+  color: var(--primary-ink);
+  border: 1px solid var(--primary);
+  padding: 8px 16px;
+  border-radius: var(--radius-control);
+  font-weight: 500;
+  font-size: var(--fs-body);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-  transition: all 0.2s ease;
+  transition: opacity var(--t-hover) ease, background-color var(--t-hover) ease;
 }
 
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+  opacity: 0.92;
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-main);
-  border: 1px solid var(--border-subtle);
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.875rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--control);
+  padding: 8px 16px;
+  border-radius: var(--radius-control);
+  font-weight: 500;
+  font-size: var(--fs-body);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  transition: background-color var(--t-hover) ease, border-color var(--t-hover) ease;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--raised);
+  border-color: var(--text);
 }
 
 .btn-danger {
-  background: rgba(244, 63, 94, 0.15);
-  color: #fb7185;
-  border: 1px solid rgba(244, 63, 94, 0.3);
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.8rem;
+  background: var(--pill-negative-bg);
+  color: var(--pill-negative-ink);
+  border: 1px solid rgba(185, 28, 28, 0.25);
+  padding: 6px 12px;
+  border-radius: var(--radius-control);
+  font-weight: 500;
+  font-size: var(--fs-small);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity var(--t-hover) ease;
 }
 
 .btn-danger:hover {
-  background: rgba(244, 63, 94, 0.25);
+  opacity: 0.85;
 }
 
-/* Forms */
+/* Form Controls */
 .form-input {
   width: 100%;
-  background: var(--bg-input);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 10px 14px;
-  color: var(--text-main);
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
+  background: var(--surface);
+  border: 1px solid var(--control);
+  border-radius: var(--radius-control);
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: var(--fs-body);
+  outline: none;
+  transition: border-color var(--t-hover) ease;
 }
 
 .form-input:focus {
-  outline: none;
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: var(--accent);
 }
 
-/* Modals */
+/* Modals & Dialogs (Shadow allowed ONLY on floating overlays) */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(6px);
+  background: rgba(15, 23, 42, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -226,12 +309,23 @@ button, input, select, textarea {
 }
 
 .modal-content {
-  background: var(--bg-surface);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16); /* taste-skill-ignore */
 }
+
+/* Status dots */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.status-dot.green { background: var(--positive); }
+.status-dot.amber { background: var(--warning); }
+.status-dot.red { background: var(--negative); }

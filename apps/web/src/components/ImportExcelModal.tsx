@@ -138,7 +138,7 @@ export default function ImportExcelModal({ isOpen, onClose, token, onImportSucce
               accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" 
               style={{ display: 'none' }} 
             />
-            <FileText size={36} style={{ color: file ? '#3b82f6' : 'var(--text-dim)', margin: '0 auto 12px' }} />
+            <FileText size={36} style={{ color: file ? 'var(--accent)' : 'var(--text-dim)', margin: '0 auto 12px' }} />
             {file ? (
               <div>
                 <p style={{ fontWeight: 600, color: 'var(--text-main)' }}>{file.name}</p>

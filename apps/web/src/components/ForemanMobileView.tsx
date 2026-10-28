@@ -18,7 +18,6 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
   const [parsedData, setParsedData] = useState<any>(null);
   const [clarificationAnswer, setClarificationAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeIssue, setActiveIssue] = useState('');
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -103,40 +102,39 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
     <div style={{
       maxWidth: '420px',
       margin: '0 auto',
-      background: '#0d111a',
-      borderRadius: '24px',
-      border: '2px solid rgba(255, 255, 255, 0.1)',
+      background: 'var(--surface)',
+      borderRadius: 'var(--radius-card)',
+      border: '1px solid var(--border)',
       overflow: 'hidden',
-      boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8)',
       display: 'flex',
       flexDirection: 'column',
-      minHeight: '620px'
+      minHeight: '580px'
     }}>
       {/* Mobile Top Bar */}
       <div style={{
-        background: 'rgba(255, 255, 255, 0.04)',
-        padding: '14px 18px',
+        background: 'var(--raised)',
+        padding: '12px 16px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+        borderBottom: '1px solid var(--border)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {step !== 'HOME' && (
             <button 
               onClick={() => setStep('HOME')} 
-              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
+              style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '4px' }}
             >
               <ArrowLeft size={18} />
             </button>
           )}
           <div>
-            <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#f8fafc' }}>MÀN HÌNH TỔ TRƯỞNG</p>
-            <p style={{ fontSize: '0.7rem', color: '#38bdf8' }}>Ca ngày 28/10 • Xưởng Cơ khí 1</p>
+            <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>MÀN HÌNH TỔ TRƯỞNG</p>
+            <p style={{ fontSize: '0.75rem', color: 'var(--accent)' }}>Ca ngày 28/10 • Xưởng Cơ khí 1</p>
           </div>
         </div>
         {onClose && (
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer' }}>
             <X size={18} />
           </button>
         )}
@@ -144,45 +142,44 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
 
       {/* MÀN HÌNH CHÍNH (4 NÚT LỚN CẢM ỨNG) */}
       {step === 'HOME' && (
-        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
+        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
           <div style={{ 
-            background: 'rgba(59, 130, 246, 0.1)', 
-            border: '1px solid rgba(59, 130, 246, 0.3)', 
+            background: 'var(--raised)', 
+            border: '1px solid var(--border)', 
             padding: '12px 16px', 
-            borderRadius: '14px' 
+            borderRadius: 'var(--radius-control)' 
           }}>
-            <p style={{ fontSize: '0.75rem', color: '#93c5fd', fontWeight: 600 }}>VIỆC CẦN LÀM HÔM NAY:</p>
-            <p style={{ fontSize: '0.85rem', color: '#ffffff', fontWeight: 700, marginTop: '2px' }}>
-              • LSX-001 (Dự án Cậu Long): Cắt & Sơn 4 bộ cổng
+            <p style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600 }}>VIỆC CẦN LÀM HÔM NAY</p>
+            <p style={{ fontSize: '0.875rem', color: 'var(--text)', fontWeight: 600, marginTop: '2px' }}>
+              LSX-001 (Dự án Cậu Long): Cắt & Sơn 4 bộ cổng
             </p>
           </div>
 
-          <p style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Quy tắc 3 chạm • Xong dưới 45 giây
+          <p style={{ fontSize: '0.75rem', color: 'var(--faint)' }}>
+            Quy tắc 3 chạm • Hoàn thành dưới 45 giây
           </p>
 
           {/* 4 Nút Lớn */}
           <button 
             onClick={() => setStep('INPUT')}
             style={{
-              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '16px',
-              padding: '18px 20px',
+              background: 'var(--primary)',
+              color: 'var(--primary-ink)',
+              border: '1px solid var(--primary)',
+              borderRadius: 'var(--radius-control)',
+              padding: '16px',
               display: 'flex',
               alignItems: 'center',
               gap: '14px',
               cursor: 'pointer',
-              boxShadow: '0 8px 20px rgba(37, 99, 235, 0.35)',
               textAlign: 'left'
             }}
           >
-            <div style={{ background: 'rgba(255, 255, 255, 0.2)', padding: '10px', borderRadius: '12px' }}>
-              <Mic size={24} />
+            <div style={{ background: 'rgba(255, 255, 255, 0.15)', padding: '10px', borderRadius: '4px' }}>
+              <Mic size={22} />
             </div>
             <div>
-              <p style={{ fontSize: '1rem', fontWeight: 800 }}>1. BÁO CÁO CA NHANH</p>
+              <p style={{ fontSize: '0.95rem', fontWeight: 600 }}>1. Báo cáo ca nhanh</p>
               <p style={{ fontSize: '0.75rem', opacity: 0.85 }}>Nói hoặc nhắn tin tự do (AI tự điền)</p>
             </div>
           </button>
@@ -190,11 +187,11 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
           <button 
             onClick={() => handleQuickPreset('to 1 cat xog 40c v5 da long 4 tho')}
             style={{
-              background: 'rgba(255, 255, 255, 0.04)',
-              color: '#f8fafc',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              padding: '16px 20px',
+              background: 'var(--surface)',
+              color: 'var(--text)',
+              border: '1px solid var(--control)',
+              borderRadius: 'var(--radius-control)',
+              padding: '14px 16px',
               display: 'flex',
               alignItems: 'center',
               gap: '14px',
@@ -202,23 +199,23 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
               textAlign: 'left'
             }}
           >
-            <div style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '10px', borderRadius: '12px' }}>
-              <Sparkles size={22} />
+            <div style={{ background: 'var(--pill-positive-bg)', color: 'var(--pill-positive-ink)', padding: '10px', borderRadius: '4px' }}>
+              <Sparkles size={20} />
             </div>
             <div>
-              <p style={{ fontSize: '0.9rem', fontWeight: 700 }}>Mẫu thử: "Cắt xong 40 cây V5"</p>
-              <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Bấm thử luồng 3 chạm siêu tốc</p>
+              <p style={{ fontSize: '0.875rem', fontWeight: 600 }}>Mẫu thử: "Cắt xong 40 cây V5"</p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>Bấm thử luồng 3 chạm siêu tốc</p>
             </div>
           </button>
 
           <button 
             onClick={() => handleQuickPreset('Chieu nay may cat bi ket luoi to 3 tho da long')}
             style={{
-              background: 'rgba(244, 63, 94, 0.08)',
-              color: '#fb7185',
-              border: '1px solid rgba(244, 63, 94, 0.2)',
-              borderRadius: '16px',
-              padding: '16px 20px',
+              background: 'var(--pill-negative-bg)',
+              color: 'var(--pill-negative-ink)',
+              border: '1px solid rgba(185, 28, 28, 0.25)',
+              borderRadius: 'var(--radius-control)',
+              padding: '14px 16px',
               display: 'flex',
               alignItems: 'center',
               gap: '14px',
@@ -226,31 +223,31 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
               textAlign: 'left'
             }}
           >
-            <div style={{ background: 'rgba(244, 63, 94, 0.15)', padding: '10px', borderRadius: '12px' }}>
-              <AlertTriangle size={22} />
+            <div style={{ padding: '10px', borderRadius: '4px', background: 'rgba(185, 28, 28, 0.1)' }}>
+              <AlertTriangle size={20} />
             </div>
             <div>
-              <p style={{ fontSize: '0.9rem', fontWeight: 700 }}>2. BÁO SỰ CỐ / THIẾU VẬT TƯ</p>
-              <p style={{ fontSize: '0.75rem', opacity: 0.8 }}>Báo ngay cho Kỹ thuật & Kho xử lý</p>
+              <p style={{ fontSize: '0.875rem', fontWeight: 600 }}>2. Báo sự cố / thiếu vật tư</p>
+              <p style={{ fontSize: '0.75rem', opacity: 0.85 }}>Báo ngay cho Kỹ thuật & Kho xử lý</p>
             </div>
           </button>
 
           <button 
             onClick={() => alert('Danh sách việc ngày mai: Hàn 4 bộ khung cổng và nhận phôi thép V50')}
             style={{
-              background: 'rgba(255, 255, 255, 0.04)',
-              color: '#f8fafc',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              padding: '14px 20px',
+              background: 'var(--surface)',
+              color: 'var(--text)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-control)',
+              padding: '12px 16px',
               display: 'flex',
               alignItems: 'center',
               gap: '14px',
               cursor: 'pointer'
             }}
           >
-            <ClipboardList size={20} style={{ color: '#60a5fa' }} />
-            <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>3. Xem việc ngày mai</span>
+            <ClipboardList size={18} style={{ color: 'var(--accent)' }} />
+            <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>3. Xem việc ngày mai</span>
           </button>
         </div>
       )}
@@ -258,7 +255,7 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
       {/* CHẠM 1: NHẬP TIN NHẮN TỰ DO / NÓI */}
       {step === 'INPUT' && (
         <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
-          <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#f8fafc' }}>
+          <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
             Nhắn tin tự nhiên như trên Zalo/Telegram:
           </p>
           <textarea 
@@ -267,21 +264,21 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
             value={rawText} 
             onChange={(e) => setRawText(e.target.value)}
             placeholder="vd: to 1 cat xog 40c thep v5 da cau long co 4 tho..."
-            style={{ fontSize: '0.95rem', lineHeight: '1.5' }}
+            style={{ fontSize: '0.875rem', lineHeight: '1.5' }}
             autoFocus
           />
 
           <div style={{ display: 'flex', gap: '8px' }}>
             <button 
               className="btn-secondary" 
-              style={{ flex: 1, justifyContent: 'center', padding: '10px' }}
+              style={{ flex: 1, justifyContent: 'center', padding: '8px', fontSize: '0.75rem' }}
               onClick={() => setRawText('to 1 cat xog 40c v5 d/a long 4 tho tang ca 2 tieng')}
             >
               Gợi ý 1
             </button>
             <button 
               className="btn-secondary" 
-              style={{ flex: 1, justifyContent: 'center', padding: '10px' }}
+              style={{ flex: 1, justifyContent: 'center', padding: '8px', fontSize: '0.75rem' }}
               onClick={() => setRawText('to 2 han xong 12 bo khung cua da biet thu to 3 nguoi')}
             >
               Gợi ý 2
@@ -290,79 +287,76 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
 
           <button 
             className="btn-primary" 
-            style={{ justifyContent: 'center', padding: '14px', marginTop: 'auto' }}
+            style={{ justifyContent: 'center', padding: '12px', marginTop: 'auto' }}
             onClick={() => handleParse()}
             disabled={!rawText.trim() || isParsing}
           >
-            {isParsing ? 'AI đang bóc tách...' : 'Tiếp tục (Xem lại) →'}
+            {isParsing ? 'AI đang xử lý...' : 'Tiếp tục (Xem lại) →'}
           </button>
         </div>
       )}
 
-      {/* CHẠM 2: AI HIỂN THỊ XEM TRƯỚC HOẶC HỎI LẠI */}
+      {/* CHẠM 2: AI TRÍCH XUẤT + HỎI LẠI (NẾU THIẾU) */}
       {step === 'CONFIRM' && parsedData && (
-        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
+        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+          {/* CẢNH BÁO THIẾU TRƯỜNG & HỎI LẠI */}
           {parsedData.needs_clarification ? (
-            /* TRƯỜNG HỢP THIẾU THÔNG TIN -> HỎI LẠI */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ 
-                background: 'rgba(245, 158, 11, 0.12)', 
-                border: '1px solid rgba(245, 158, 11, 0.3)', 
-                padding: '16px', 
-                borderRadius: '16px' 
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fbbf24', fontWeight: 700, marginBottom: '6px' }}>
-                  <MessageSquare size={18} /> AI Cần hỏi lại:
-                </div>
-                <p style={{ fontSize: '0.9rem', color: '#f8fafc', lineHeight: '1.5' }}>
-                  {parsedData.clarification_question}
-                </p>
+            <div style={{ 
+              background: 'var(--pill-warning-bg)', 
+              border: '1px solid rgba(180, 83, 9, 0.3)', 
+              padding: '14px', 
+              borderRadius: 'var(--radius-control)' 
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <AlertTriangle size={18} color="var(--pill-warning-ink)" />
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--pill-warning-ink)' }}>
+                  CẦN BỔ SUNG THÔNG TIN
+                </span>
               </div>
+              <p style={{ fontSize: '0.875rem', color: 'var(--pill-warning-ink)', lineHeight: '1.4' }}>
+                {parsedData.clarification_question || 'Báo cáo chưa rõ mã lệnh sản xuất hoặc công đoạn.'}
+              </p>
 
-              <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Chọn nhanh câu trả lời:</p>
-              <button 
-                className="btn-secondary" 
-                style={{ justifyContent: 'flex-start', padding: '10px 14px' }}
-                onClick={() => handleAnswerClarification('Dự án Cậu Long LSX-001')}
-              >
-                👉 Dự án Cậu Long (LSX-2026-001)
-              </button>
-              <button 
-                className="btn-secondary" 
-                style={{ justifyContent: 'flex-start', padding: '10px 14px' }}
-                onClick={() => handleAnswerClarification('Công đoạn Cắt thép')}
-              >
-                👉 Công đoạn Cắt thép
-              </button>
-              <button 
-                className="btn-secondary" 
-                style={{ justifyContent: 'flex-start', padding: '10px 14px' }}
-                onClick={() => handleAnswerClarification('Số lượng 30 cây')}
-              >
-                👉 Số lượng 30 cây
-              </button>
+              {/* Nút bấm gợi ý trả lời nhanh */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '12px' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--pill-warning-ink)', fontWeight: 600 }}>CHỌN NHANH:</p>
+                <button 
+                  className="btn-secondary" 
+                  style={{ textAlign: 'left', fontSize: '0.8rem', padding: '6px 10px', background: 'var(--surface)' }}
+                  onClick={() => handleAnswerClarification('cho du an Cau Long')}
+                >
+                  • Dự án Cậu Long (LSX-001)
+                </button>
+                <button 
+                  className="btn-secondary" 
+                  style={{ textAlign: 'left', fontSize: '0.8rem', padding: '6px 10px', background: 'var(--surface)' }}
+                  onClick={() => handleAnswerClarification('cho du an Tan Binh')}
+                >
+                  • Dự án Tân Bình (LSX-002)
+                </button>
+              </div>
             </div>
           ) : (
-            /* TRƯỜNG HỢP ĐỦ THÔNG TIN -> XÁC NHẬN 1 CHẠM */
+            /* ĐỦ TRƯỜNG - HIỂN THỊ ĐỂ DUYỆT */
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ 
-                background: 'rgba(16, 185, 129, 0.1)', 
-                border: '1px solid rgba(16, 185, 129, 0.3)', 
-                padding: '14px 18px', 
-                borderRadius: '16px' 
+                background: 'var(--surface)', 
+                border: '1px solid var(--border)', 
+                padding: '14px 16px', 
+                borderRadius: 'var(--radius-control)' 
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '0.75rem', color: '#34d399', fontWeight: 700 }}>✓ ĐÃ TRÍCH XUẤT XONG</span>
-                  <span className="badge badge-green">Tin cậy {intConfidence(parsedData.confidence_score)}%</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--positive)', fontWeight: 600 }}>ĐÃ TRÍCH XUẤT XONG</span>
+                  <span className="pill pos">Tin cậy {intConfidence(parsedData.confidence_score)}%</span>
                 </div>
                 
-                <div style={{ fontSize: '0.85rem', lineHeight: '1.8', color: '#f8fafc' }}>
-                  <p>• <b>Lệnh SX:</b> <span style={{ color: '#38bdf8' }}>{parsedData.work_order_code || 'LSX-2026-001'}</span></p>
+                <div style={{ fontSize: '0.875rem', lineHeight: '1.8', color: 'var(--text)' }}>
+                  <p>• <b>Lệnh SX:</b> <span className="mono" style={{ color: 'var(--accent)' }}>{parsedData.work_order_code || 'LSX-2026-001'}</span></p>
                   <p>• <b>Công đoạn:</b> {parsedData.stage_name}</p>
-                  <p>• <b>Sản lượng:</b> <span style={{ color: '#34d399', fontWeight: 800, fontSize: '1rem' }}>{parsedData.completed_qty} {parsedData.unit}</span></p>
-                  <p>• <b>Nhân sự:</b> {parsedData.worker_count} thợ ({parsedData.total_man_hours} giờ công)</p>
+                  <p>• <b>Sản lượng:</b> <span className="mono" style={{ color: 'var(--positive)', fontWeight: 600 }}>{parsedData.completed_qty} {parsedData.unit}</span></p>
+                  <p>• <b>Nhân sự:</b> <span className="mono">{parsedData.worker_count}</span> thợ (<span className="mono">{parsedData.total_man_hours}</span> giờ công)</p>
                   {parsedData.issues_reported && (
-                    <p style={{ color: '#fb7185' }}>• <b>Sự cố:</b> {parsedData.issues_reported}</p>
+                    <p style={{ color: 'var(--negative)' }}>• <b>Sự cố:</b> {parsedData.issues_reported}</p>
                   )}
                 </div>
               </div>
@@ -372,20 +366,18 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
                 className="btn-primary" 
                 style={{ 
                   justifyContent: 'center', 
-                  padding: '16px', 
-                  fontSize: '1rem', 
-                  background: 'linear-gradient(135deg, #10b981, #059669)',
-                  boxShadow: '0 8px 25px rgba(16, 185, 129, 0.4)'
+                  padding: '14px', 
+                  fontSize: '0.95rem'
                 }}
                 onClick={handleConfirmLog}
                 disabled={isSubmitting}
               >
-                <CheckCircle2 size={20} /> {isSubmitting ? 'Đang gửi...' : 'XÁC NHẬN GỬI BÁO CÁO (XONG!)'}
+                <CheckCircle2 size={18} /> {isSubmitting ? 'Đang gửi...' : 'Xác nhận gửi báo cáo (Hoàn tất)'}
               </button>
 
               <button 
                 className="btn-secondary" 
-                style={{ justifyContent: 'center', padding: '10px' }}
+                style={{ justifyContent: 'center', padding: '8px', fontSize: '0.8rem' }}
                 onClick={() => setStep('INPUT')}
               >
                 Sửa lại tin nhắn
@@ -398,11 +390,11 @@ export default function ForemanMobileView({ token, onClose, onLogSubmitted }: Fo
       {/* HOÀN TẤT */}
       {step === 'SUCCESS' && (
         <div style={{ padding: '32px 20px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', flex: 1, justifyContent: 'center' }}>
-          <div style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', padding: '16px', borderRadius: '50%' }}>
-            <CheckCircle2 size={44} />
+          <div style={{ background: 'var(--pill-positive-bg)', color: 'var(--pill-positive-ink)', padding: '16px', borderRadius: '50%' }}>
+            <CheckCircle2 size={40} />
           </div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f8fafc' }}>GỬI CA THÀNH CÔNG!</h3>
-          <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.5' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text)' }}>GỬI CA THÀNH CÔNG</h3>
+          <p style={{ fontSize: '0.875rem', color: 'var(--muted)', lineHeight: '1.5' }}>
             Số liệu đã được cập nhật trực tiếp vào tiến độ xưởng và gửi về bảng điều hành của Quản đốc & Giám đốc.
           </p>
           <button 

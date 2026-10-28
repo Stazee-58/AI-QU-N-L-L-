@@ -16,7 +16,7 @@ export default function HelpModal({ isOpen, onClose, activeTab }: HelpModalProps
       <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px' }}>
         <div style={{ padding: '24px 28px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ background: 'rgba(59, 130, 246, 0.2)', padding: '8px', borderRadius: '10px', color: '#60a5fa' }}>
+            <div style={{ background: 'rgba(59, 130, 246, 0.2)', padding: '8px', borderRadius: '10px', color: 'var(--accent)' }}>
               <HelpCircle size={22} />
             </div>
             <div>
@@ -32,7 +32,7 @@ export default function HelpModal({ isOpen, onClose, activeTab }: HelpModalProps
         <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {activeTab === 'users' && (
             <div>
-              <h4 style={{ color: '#60a5fa', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h4 style={{ color: 'var(--accent)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <ShieldCheck size={18} /> Hướng dẫn Quản lý Người dùng & Phân quyền
               </h4>
               <ul style={{ paddingLeft: '20px', color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: '1.6' }}>
@@ -73,7 +73,7 @@ export default function HelpModal({ isOpen, onClose, activeTab }: HelpModalProps
 
           {activeTab === 'ai_audit' && (
             <div>
-              <h4 style={{ color: '#a78bfa', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h4 style={{ color: 'var(--accent)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <CheckCircle2 size={18} /> Nhật ký Bất biến & Đối soát AI
               </h4>
               <ul style={{ paddingLeft: '20px', color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: '1.6' }}>
@@ -84,8 +84,8 @@ export default function HelpModal({ isOpen, onClose, activeTab }: HelpModalProps
             </div>
           )}
 
-          <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '14px 18px', borderRadius: '12px', border: '1px solid var(--border-subtle)', fontSize: '0.8rem', color: 'var(--text-dim)' }}>
-            💡 <b>Mẹo đào tạo:</b> Mục tiêu của hệ thống là người mới tự làm được $\ge 90\%$ việc sau 1 tuần. Mọi thao tác hằng ngày được tối ưu dưới 3 chạm và dưới 1 phút.
+          <div style={{ background: 'var(--raised)', padding: '14px 18px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '0.8rem', color: 'var(--muted)' }}>
+            <b>Mẹo vận hành:</b> Mục tiêu của hệ thống là người mới tự làm được sau 30 phút hướng dẫn. Mọi thao tác hằng ngày được tối ưu dưới 3 chạm và dưới 1 phút.
           </div>
         </div>
 

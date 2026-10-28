@@ -87,12 +87,12 @@ export default function EditMaterialModal({
       <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ background: 'rgba(59, 130, 246, 0.2)', padding: '8px', borderRadius: '10px', color: '#60a5fa' }}>
+            <div style={{ background: 'rgba(59, 130, 246, 0.2)', padding: '8px', borderRadius: '10px', color: 'var(--accent)' }}>
               <Edit3 size={22} />
             </div>
             <div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)' }}>Chỉnh sửa Vật tư & Bảng giá</h3>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Mã: <span style={{ color: '#60a5fa', fontWeight: 600 }}>{material.code}</span> ({material.name})</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Mã: <span style={{ color: 'var(--accent)', fontWeight: 600 }}>{material.code}</span> ({material.name})</p>
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>

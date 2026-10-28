@@ -269,7 +269,7 @@ export default function AppHome() {
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div className="card-glass" style={{ width: '100%', maxWidth: '440px', padding: '40px 32px' }}>
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <div style={{ display: 'inline-flex', padding: '12px', background: 'rgba(59, 130, 246, 0.15)', borderRadius: '16px', color: '#60a5fa', marginBottom: '14px' }}>
+            <div style={{ display: 'inline-flex', padding: '12px', background: 'rgba(59, 130, 246, 0.15)', borderRadius: '16px', color: 'var(--accent)', marginBottom: '14px' }}>
               <ShieldCheck size={36} />
             </div>
             <h1 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-main)' }}>
@@ -282,7 +282,7 @@ export default function AppHome() {
 
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {loginError && (
-              <div style={{ background: 'rgba(244, 63, 94, 0.12)', border: '1px solid rgba(244, 63, 94, 0.3)', padding: '10px 14px', borderRadius: '10px', color: '#fb7185', fontSize: '0.85rem' }}>
+              <div style={{ background: 'rgba(244, 63, 94, 0.12)', border: '1px solid rgba(244, 63, 94, 0.3)', padding: '10px 14px', borderRadius: '10px', color: 'var(--negative)', fontSize: '0.85rem' }}>
                 {loginError}
               </div>
             )}
@@ -308,16 +308,16 @@ export default function AppHome() {
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'admin', 'Admin@123456')}>
-                👑 Quản trị (Admin)
+                Quản trị (admin)
               </button>
               <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'director', 'Director@123456')}>
-                👔 Giám đốc
+                Giám đốc (director)
               </button>
               <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'totruong', 'Foreman@123456')}>
-                🏭 Tổ trưởng xưởng
+                Tổ trưởng (totruong)
               </button>
               <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'kinhdoanh', 'Sales@123456')}>
-                💼 Kinh doanh
+                Kinh doanh (kinhdoanh)
               </button>
             </div>
           </div>
@@ -330,10 +330,9 @@ export default function AppHome() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Top Header */}
       <header style={{ 
-        background: 'var(--glass-bg)', 
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid var(--border-subtle)',
-        padding: '12px 28px',
+        background: 'var(--surface)', 
+        borderBottom: '1px solid var(--border)',
+        padding: '10px 24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -341,38 +340,38 @@ export default function AppHome() {
         top: 0,
         zIndex: 100
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ background: 'linear-gradient(135deg, #3b82f6, #06b6d4)', padding: '8px 12px', borderRadius: '10px', fontWeight: 800, fontSize: '0.95rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ background: 'var(--primary)', color: 'var(--primary-ink)', padding: '6px 10px', borderRadius: 'var(--radius-control)', fontWeight: 700, fontSize: '0.9rem' }}>
             CL
           </div>
           <div>
-            <h1 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)' }}>CẬU LONG ENTERPRISE</h1>
-            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Hệ thống Điều hành Sản xuất & Báo cáo Ca Xưởng (G2)</p>
+            <h1 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text)' }}>CẬU LONG ENTERPRISE</h1>
+            <p style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>Hệ thống Điều hành Sản xuất & Báo cáo Ca Xưởng</p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border-subtle)', padding: '6px 12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem' }}>
-            <Activity size={15} style={{ color: '#10b981' }} />
-            <span style={{ color: 'var(--text-dim)' }}>Hạn mức AI tháng:</span>
-            <span style={{ color: '#10b981', fontWeight: 700 }}>$12.40 / $50.00</span>
-            <span className="badge badge-green" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>24.8%</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ background: 'var(--raised)', border: '1px solid var(--border)', padding: '4px 10px', borderRadius: 'var(--radius-control)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem' }}>
+            <Activity size={14} style={{ color: 'var(--positive)' }} />
+            <span style={{ color: 'var(--muted)' }}>Hạn mức AI tháng:</span>
+            <span style={{ color: 'var(--text)', fontWeight: 600 }}>$12.40 / $50.00</span>
+            <span className="pill pos" style={{ fontSize: '0.7rem', padding: '1px 6px' }}>24.8%</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '0.825rem', fontWeight: 600 }}>{currentUser.full_name}</p>
-              <p style={{ fontSize: '0.7rem', color: '#60a5fa' }}>{currentUser.role_name}</p>
+              <p style={{ fontSize: '0.8rem', fontWeight: 600 }}>{currentUser.full_name}</p>
+              <p style={{ fontSize: '0.7rem', color: 'var(--accent)' }}>{currentUser.role_name}</p>
             </div>
-            <span className="badge badge-blue">{currentUser.role_code}</span>
+            <span className="pill neutral">{currentUser.role_code}</span>
           </div>
 
-          <button className="btn-secondary" style={{ padding: '8px 14px', fontSize: '0.8rem' }} onClick={() => setIsHelpOpen(true)}>
-            <HelpCircle size={16} /> <b>?</b> Hướng dẫn
+          <button className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.75rem' }} onClick={() => setIsHelpOpen(true)}>
+            <HelpCircle size={15} /> <b>?</b> Hướng dẫn
           </button>
 
-          <button onClick={handleLogout} className="btn-secondary" style={{ padding: '8px 12px', color: '#fb7185' }}>
-            <LogOut size={16} />
+          <button onClick={handleLogout} className="btn-secondary" style={{ padding: '6px 10px', color: 'var(--negative)' }} title="Đăng xuất">
+            <LogOut size={15} />
           </button>
         </div>
       </header>
@@ -381,52 +380,52 @@ export default function AppHome() {
       <div style={{ display: 'flex', flex: 1 }}>
         {/* Sidebar */}
         <aside style={{ 
-          width: '260px', 
-          background: 'rgba(18, 23, 34, 0.5)', 
-          borderRight: '1px solid var(--border-subtle)', 
-          padding: '20px 14px',
+          width: '240px', 
+          background: 'var(--raised)', 
+          borderRight: '1px solid var(--border)', 
+          padding: '16px 12px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px'
+          gap: '4px'
         }}>
-          <p style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 12px 6px' }}>
+          <p style={{ fontSize: '0.7rem', color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 8px 6px', fontWeight: 600 }}>
             Điều hành Xưởng (G2)
           </p>
 
-          <button onClick={() => setActiveTab('work_orders')} className={`btn-secondary ${activeTab === 'work_orders' ? 'btn-primary' : ''}`} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'work_orders' ? 'none' : undefined }}>
-            <BarChart3 size={18} /> Tiến độ Lệnh Sản xuất
+          <button onClick={() => setActiveTab('work_orders')} className={activeTab === 'work_orders' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'work_orders' ? 'none' : '1px solid transparent', background: activeTab === 'work_orders' ? undefined : 'transparent' }}>
+            <BarChart3 size={16} /> Tiến độ Lệnh Sản xuất
           </button>
 
-          <button onClick={() => setActiveTab('daily_reports')} className={`btn-secondary ${activeTab === 'daily_reports' ? 'btn-primary' : ''}`} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'daily_reports' ? 'none' : undefined }}>
-            <FileSpreadsheet size={18} /> Báo cáo Điều hành (3 Bản)
+          <button onClick={() => setActiveTab('daily_reports')} className={activeTab === 'daily_reports' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'daily_reports' ? 'none' : '1px solid transparent', background: activeTab === 'daily_reports' ? undefined : 'transparent' }}>
+            <FileSpreadsheet size={16} /> Báo cáo Điều hành (3 Bản)
           </button>
 
-          <button onClick={() => setActiveTab('foreman_mobile')} className={`btn-secondary ${activeTab === 'foreman_mobile' ? 'btn-primary' : ''}`} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'foreman_mobile' ? 'none' : undefined }}>
-            <Smartphone size={18} /> ĐT Tổ Trưởng (3 Chạm)
+          <button onClick={() => setActiveTab('foreman_mobile')} className={activeTab === 'foreman_mobile' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'foreman_mobile' ? 'none' : '1px solid transparent', background: activeTab === 'foreman_mobile' ? undefined : 'transparent' }}>
+            <Smartphone size={16} /> ĐT Tổ Trưởng (3 Chạm)
           </button>
 
-          <p style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '14px 12px 6px' }}>
+          <p style={{ fontSize: '0.7rem', color: 'var(--faint)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '14px 8px 6px', fontWeight: 600 }}>
             Quản trị Nền tảng (G1)
           </p>
 
-          <button onClick={() => setActiveTab('materials')} className={`btn-secondary ${activeTab === 'materials' ? 'btn-primary' : ''}`} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'materials' ? 'none' : undefined }}>
-            <Package size={18} /> Vật tư & Bảng giá
+          <button onClick={() => setActiveTab('materials')} className={activeTab === 'materials' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'materials' ? 'none' : '1px solid transparent', background: activeTab === 'materials' ? undefined : 'transparent' }}>
+            <Package size={16} /> Vật tư & Bảng giá
           </button>
 
-          <button onClick={() => setActiveTab('norms')} className={`btn-secondary ${activeTab === 'norms' ? 'btn-primary' : ''}`} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'norms' ? 'none' : undefined }}>
-            <FileSpreadsheet size={18} /> Định mức (BOM)
+          <button onClick={() => setActiveTab('norms')} className={activeTab === 'norms' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'norms' ? 'none' : '1px solid transparent', background: activeTab === 'norms' ? undefined : 'transparent' }}>
+            <FileSpreadsheet size={16} /> Định mức (BOM)
           </button>
 
-          <button onClick={() => setActiveTab('ai_settings')} className={`btn-secondary ${activeTab === 'ai_settings' ? 'btn-primary' : ''}`} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'ai_settings' ? 'none' : undefined }}>
-            <Settings size={18} /> Cài đặt & Quyền AI
+          <button onClick={() => setActiveTab('ai_settings')} className={activeTab === 'ai_settings' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'ai_settings' ? 'none' : '1px solid transparent', background: activeTab === 'ai_settings' ? undefined : 'transparent' }}>
+            <Settings size={16} /> Cài đặt & Quyền AI
           </button>
 
-          <button onClick={() => setActiveTab('ai_audit')} className={`btn-secondary ${activeTab === 'ai_audit' ? 'btn-primary' : ''}`} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'ai_audit' ? 'none' : undefined }}>
-            <History size={18} /> Nhật ký Đối soát AI
+          <button onClick={() => setActiveTab('ai_audit')} className={activeTab === 'ai_audit' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'ai_audit' ? 'none' : '1px solid transparent', background: activeTab === 'ai_audit' ? undefined : 'transparent' }}>
+            <History size={16} /> Nhật ký Đối soát AI
           </button>
 
-          <button onClick={() => setActiveTab('users')} className={`btn-secondary ${activeTab === 'users' ? 'btn-primary' : ''}`} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'users' ? 'none' : undefined }}>
-            <Users size={18} /> Quản lý Người dùng
+          <button onClick={() => setActiveTab('users')} className={activeTab === 'users' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'users' ? 'none' : '1px solid transparent', background: activeTab === 'users' ? undefined : 'transparent' }}>
+            <Users size={16} /> Quản lý Người dùng
           </button>
         </aside>
 
@@ -444,11 +443,11 @@ export default function AppHome() {
                   <button className={`btn-secondary ${riskFilter === null ? 'btn-primary' : ''}`} style={{ fontSize: '0.8rem', padding: '6px 12px' }} onClick={() => setRiskFilter(null)}>
                     Tất cả ({workOrders.length})
                   </button>
-                  <button className={`btn-secondary ${riskFilter === 'CRITICAL' ? 'btn-primary' : ''}`} style={{ fontSize: '0.8rem', padding: '6px 12px', color: '#fb7185' }} onClick={() => setRiskFilter('CRITICAL')}>
-                    🔴 Quá hạn ({workOrders.filter(w => w.risk_level === 'CRITICAL').length})
+                  <button className={`btn-secondary ${riskFilter === 'CRITICAL' ? 'btn-primary' : ''}`} style={{ fontSize: '0.8rem', padding: '6px 12px', color: 'var(--negative)' }} onClick={() => setRiskFilter('CRITICAL')}>
+                    <span className="status-dot red" style={{ marginRight: '6px' }}></span> Quá hạn ({workOrders.filter(w => w.risk_level === 'CRITICAL').length})
                   </button>
-                  <button className={`btn-secondary ${riskFilter === 'WARNING' ? 'btn-primary' : ''}`} style={{ fontSize: '0.8rem', padding: '6px 12px', color: '#fbbf24' }} onClick={() => setRiskFilter('WARNING')}>
-                    🟡 Nguy cơ trễ ({workOrders.filter(w => w.risk_level === 'WARNING').length})
+                  <button className={`btn-secondary ${riskFilter === 'WARNING' ? 'btn-primary' : ''}`} style={{ fontSize: '0.8rem', padding: '6px 12px', color: 'var(--warning)' }} onClick={() => setRiskFilter('WARNING')}>
+                    <span className="status-dot amber" style={{ marginRight: '6px' }}></span> Nguy cơ trễ ({workOrders.filter(w => w.risk_level === 'WARNING').length})
                   </button>
                 </div>
               </div>
@@ -463,14 +462,14 @@ export default function AppHome() {
                     return (
                       <div key={wo.id} className="card-glass" style={{ 
                         padding: '22px', 
-                        borderLeft: isCritical ? '4px solid #f43f5e' : isWarning ? '4px solid #f59e0b' : '4px solid #10b981',
+                        borderLeft: isCritical ? '4px solid var(--negative)' : isWarning ? '4px solid var(--warning)' : '4px solid var(--positive)',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '14px'
                       }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           <div>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#60a5fa' }}>{wo.code}</span>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)' }}>{wo.code}</span>
                             <h3 style={{ fontSize: '1rem', fontWeight: 700, marginTop: '2px' }}>{wo.product_name}</h3>
                           </div>
                           {isCritical ? (
@@ -486,7 +485,7 @@ export default function AppHome() {
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '6px' }}>
                             <span style={{ color: 'var(--text-muted)' }}>Tiến độ: <b>{wo.completed_qty} / {wo.target_qty} {wo.unit}</b></span>
-                            <span style={{ fontWeight: 800, color: isCritical ? '#fb7185' : isWarning ? '#fbbf24' : '#34d399' }}>
+                            <span style={{ fontWeight: 800, color: isCritical ? 'var(--negative)' : isWarning ? 'var(--warning)' : 'var(--positive)' }}>
                               {wo.progress_percent}%
                             </span>
                           </div>
@@ -494,7 +493,7 @@ export default function AppHome() {
                             <div style={{ 
                               width: `${Math.min(100, wo.progress_percent)}%`, 
                               height: '100%', 
-                              background: isCritical ? '#f43f5e' : isWarning ? '#f59e0b' : '#10b981',
+                              background: isCritical ? 'var(--negative)' : isWarning ? 'var(--warning)' : 'var(--positive)',
                               transition: 'width 0.5s ease'
                             }} />
                           </div>
@@ -508,7 +507,7 @@ export default function AppHome() {
                             padding: '10px 14px', 
                             borderRadius: '10px', 
                             fontSize: '0.8rem',
-                            color: isCritical ? '#fb7185' : '#fbbf24',
+                            color: isCritical ? 'var(--negative)' : 'var(--warning)',
                             display: 'flex',
                             gap: '8px',
                             alignItems: 'center'
@@ -549,21 +548,21 @@ export default function AppHome() {
                   className={`btn-secondary ${reportVersion === 'director' ? 'btn-primary' : ''}`}
                   style={{ fontSize: '0.85rem', padding: '8px 16px', border: reportVersion === 'director' ? 'none' : undefined }}
                 >
-                  👔 1. Bản Giám đốc (1 Trang)
+                  1. Bản Giám đốc (1 Trang)
                 </button>
                 <button 
                   onClick={() => setReportVersion('tech')}
                   className={`btn-secondary ${reportVersion === 'tech' ? 'btn-primary' : ''}`}
                   style={{ fontSize: '0.85rem', padding: '8px 16px', border: reportVersion === 'tech' ? 'none' : undefined }}
                 >
-                  📐 2. Bản Kỹ thuật & Xưởng
+                  2. Bản Kỹ thuật & Xưởng
                 </button>
                 <button 
                   onClick={() => setReportVersion('sales')}
                   className={`btn-secondary ${reportVersion === 'sales' ? 'btn-primary' : ''}`}
                   style={{ fontSize: '0.85rem', padding: '8px 16px', border: reportVersion === 'sales' ? 'none' : undefined }}
                 >
-                  💼 3. Bản Kinh doanh "Việc hôm nay"
+                  3. Bản Kinh doanh "Việc hôm nay"
                 </button>
               </div>
 
@@ -572,9 +571,9 @@ export default function AppHome() {
                   {/* 1. BẢN GIÁM ĐỐC NGẮN */}
                   {reportVersion === 'director' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                      <div className="card-glass" style={{ padding: '24px', background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(6, 182, 212, 0.05))' }}>
-                        <p style={{ fontSize: '0.75rem', color: '#60a5fa', fontWeight: 700, textTransform: 'uppercase' }}>KẾT LUẬN ĐIỀU HÀNH HÔM NAY</p>
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginTop: '4px', color: '#f8fafc' }}>
+                      <div className="panel" style={{ padding: '20px', background: 'var(--raised)' }}>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase' }}>KẾT LUẬN ĐIỀU HÀNH HÔM NAY</p>
+                        <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginTop: '4px', color: 'var(--text)' }}>
                           {dailySummary.director_summary.one_sentence_takeaway}
                         </h3>
                       </div>
@@ -589,19 +588,19 @@ export default function AppHome() {
                         </div>
                         <div className="card-glass" style={{ padding: '18px' }}>
                           <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>NGUY CƠ TRỄ HẠN</p>
-                          <p style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fb7185', marginTop: '4px' }}>
+                          <p style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--negative)', marginTop: '4px' }}>
                             {dailySummary.director_summary.kpis.delayed_risk_count}
                           </p>
                         </div>
                         <div className="card-glass" style={{ padding: '18px' }}>
                           <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>SẢN LƯỢNG HÔM NAY</p>
-                          <p style={{ fontSize: '1.6rem', fontWeight: 800, color: '#34d399', marginTop: '4px' }}>
+                          <p style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--positive)', marginTop: '4px' }}>
                             {dailySummary.director_summary.kpis.today_units_completed} sản phẩm
                           </p>
                         </div>
                         <div className="card-glass" style={{ padding: '18px' }}>
                           <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>TỔNG GIÁ TRỊ XƯỞNG ĐANG LÀM</p>
-                          <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#38bdf8', marginTop: '4px' }}>
+                          <p style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent)', marginTop: '4px' }}>
                             {formatVND(dailySummary.director_summary.kpis.estimated_wip_value)}
                           </p>
                         </div>
@@ -610,7 +609,7 @@ export default function AppHome() {
                       {/* Cảnh báo đỏ & Chờ duyệt */}
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                         <div className="card-glass" style={{ padding: '22px' }}>
-                          <h4 style={{ color: '#fb7185', fontSize: '0.95rem', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <h4 style={{ color: 'var(--negative)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <AlertTriangle size={18} /> Cảnh báo rủi ro nghiêm trọng:
                           </h4>
                           <ul style={{ paddingLeft: '18px', color: 'var(--text-main)', fontSize: '0.85rem', lineHeight: '1.8' }}>
@@ -621,7 +620,7 @@ export default function AppHome() {
                         </div>
 
                         <div className="card-glass" style={{ padding: '22px' }}>
-                          <h4 style={{ color: '#fbbf24', fontSize: '0.95rem', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <h4 style={{ color: 'var(--warning)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <CheckCircle2 size={18} /> Mục chờ Giám đốc duyệt nhanh:
                           </h4>
                           <ul style={{ paddingLeft: '18px', color: 'var(--text-main)', fontSize: '0.85rem', lineHeight: '1.8' }}>
@@ -651,8 +650,8 @@ export default function AppHome() {
                           <tbody>
                             {Object.entries(dailySummary.tech_summary.stages).map(([stage, info]: [string, any]) => (
                               <tr key={stage}>
-                                <td style={{ fontWeight: 700, color: '#38bdf8' }}>{stage}</td>
-                                <td style={{ fontWeight: 800, color: '#34d399' }}>{info.qty}</td>
+                                <td style={{ fontWeight: 700, color: 'var(--accent)' }}>{stage}</td>
+                                <td style={{ fontWeight: 800, color: 'var(--positive)' }}>{info.qty}</td>
                                 <td>{info.hours} giờ</td>
                                 <td>{info.workers} thợ</td>
                                 <td><span className="badge badge-green">Hoạt động</span></td>
@@ -664,8 +663,8 @@ export default function AppHome() {
 
                       {dailySummary.tech_summary.reported_issues.length > 0 && (
                         <div className="card-glass" style={{ padding: '20px' }}>
-                          <h4 style={{ color: '#fb7185', fontSize: '0.95rem', fontWeight: 700, marginBottom: '12px' }}>
-                            ⚠️ Báo cáo sự cố từ các tổ trưởng:
+                          <h4 style={{ color: 'var(--negative)', fontSize: '0.9rem', fontWeight: 600, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <AlertTriangle size={16} /> Báo cáo sự cố từ các tổ trưởng:
                           </h4>
                           <ul style={{ paddingLeft: '18px', color: 'var(--text-main)', fontSize: '0.85rem', lineHeight: '1.8' }}>
                             {dailySummary.tech_summary.reported_issues.map((iss: any, i: number) => (
@@ -684,7 +683,7 @@ export default function AppHome() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                       {/* Sắp hoàn thành giao hàng */}
                       <div className="card-glass" style={{ padding: '22px' }}>
-                        <h4 style={{ color: '#34d399', fontSize: '0.95rem', fontWeight: 700, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <h4 style={{ color: 'var(--positive)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <Truck size={18} /> Đơn hàng sắp xong ({'>= 90%'}): Gọi khách hẹn ngày lắp đặt
                         </h4>
                         <div className="data-table-container">
@@ -702,10 +701,10 @@ export default function AppHome() {
                               {dailySummary.sales_summary.ready_to_dispatch.map((item: any, i: number) => (
                                 <tr key={i}>
                                   <td style={{ fontWeight: 700 }}>{item.customer}</td>
-                                  <td style={{ color: '#60a5fa' }}>{item.phone}</td>
+                                  <td style={{ color: 'var(--accent)' }}>{item.phone}</td>
                                   <td>{item.product}</td>
                                   <td><span className="badge badge-green">{item.progress}</span></td>
-                                  <td style={{ color: '#34d399', fontWeight: 600 }}>{item.action}</td>
+                                  <td style={{ color: 'var(--positive)', fontWeight: 600 }}>{item.action}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -715,7 +714,7 @@ export default function AppHome() {
 
                       {/* Đơn bị vướng trễ */}
                       <div className="card-glass" style={{ padding: '22px' }}>
-                        <h4 style={{ color: '#fb7185', fontSize: '0.95rem', fontWeight: 700, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <h4 style={{ color: 'var(--negative)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <PhoneCall size={18} /> Đơn có nguy cơ trễ: Cần gọi khách thông báo & chăm sóc
                         </h4>
                         <div className="data-table-container">
@@ -733,10 +732,10 @@ export default function AppHome() {
                               {dailySummary.sales_summary.need_customer_call.map((item: any, i: number) => (
                                 <tr key={i}>
                                   <td style={{ fontWeight: 700 }}>{item.customer}</td>
-                                  <td style={{ color: '#60a5fa' }}>{item.phone}</td>
+                                  <td style={{ color: 'var(--accent)' }}>{item.phone}</td>
                                   <td>{item.product}</td>
-                                  <td style={{ color: '#fb7185' }}>{item.reason}</td>
-                                  <td style={{ color: '#fbbf24', fontWeight: 600 }}>{item.action}</td>
+                                  <td style={{ color: 'var(--negative)' }}>{item.reason}</td>
+                                  <td style={{ color: 'var(--warning)', fontWeight: 600 }}>{item.action}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -755,8 +754,8 @@ export default function AppHome() {
             <div style={{ padding: '20px 0' }}>
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Giao diện Di động Tổ trưởng Xưởng (Mobile First)</h2>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  Thao tác ngón tay to • Quy tắc 3 chạm: Báo nhanh 🎙️ $\rightarrow$ Xem lại $\rightarrow$ Xác nhận gửi (dưới 45s)
+                <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
+                  Thao tác ngón tay to • Quy tắc 3 chạm: Báo nhanh $\rightarrow$ Xem lại $\rightarrow$ Xác nhận gửi (dưới 45s)
                 </p>
               </div>
 
@@ -804,12 +803,12 @@ export default function AppHome() {
                   <tbody>
                     {materials.filter(m => m.code.toLowerCase().includes(materialSearch.toLowerCase()) || m.name.toLowerCase().includes(materialSearch.toLowerCase())).map((m) => (
                       <tr key={m.id}>
-                        <td style={{ fontWeight: 700, color: '#38bdf8' }}>{m.code}</td>
+                        <td style={{ fontWeight: 700, color: 'var(--accent)' }}>{m.code}</td>
                         <td style={{ fontWeight: 600 }}>{m.name}</td>
                         <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{m.spec || '-'}</td>
                         <td><span className="badge badge-blue">{m.unit}</span></td>
                         <td>{m.category}</td>
-                        <td style={{ fontWeight: 700, color: '#34d399' }}>{formatVND(m.standard_price)}</td>
+                        <td style={{ fontWeight: 700, color: 'var(--positive)' }}>{formatVND(m.standard_price)}</td>
                         <td style={{ color: 'var(--text-dim)' }}>{m.min_stock_alert}</td>
                         <td>
                           <span className={m.current_stock < m.min_stock_alert ? 'badge badge-red' : 'badge badge-green'}>
@@ -869,7 +868,7 @@ export default function AppHome() {
                   <div key={s.id} className="card-glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <span style={{ fontSize: '0.75rem', color: '#60a5fa', fontWeight: 700 }}>{s.feature_key}</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 700 }}>{s.feature_key}</span>
                         <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginTop: '2px' }}>{s.feature_name}</h3>
                       </div>
                       
@@ -936,7 +935,7 @@ export default function AppHome() {
                   <tbody>
                     {auditLogs.map((log) => (
                       <tr key={log.id}>
-                        <td style={{ fontWeight: 600, color: '#60a5fa' }}>{log.module_name}</td>
+                        <td style={{ fontWeight: 600, color: 'var(--accent)' }}>{log.module_name}</td>
                         <td>{log.user_id}</td>
                         <td>
                           <span className={log.confidence_score >= 0.9 ? 'badge badge-green' : 'badge badge-amber'}>
@@ -950,7 +949,7 @@ export default function AppHome() {
                             <span className="badge badge-green">Giữ nguyên AI</span>
                           )}
                         </td>
-                        <td style={{ color: '#34d399', fontWeight: 600 }}>${log.cost_usd.toFixed(4)}</td>
+                        <td style={{ color: 'var(--positive)', fontWeight: 600 }}>${log.cost_usd.toFixed(4)}</td>
                         <td style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>
                           {new Date(log.created_at).toLocaleString('vi-VN')}
                         </td>
@@ -993,7 +992,7 @@ export default function AppHome() {
                   <tbody>
                     {users.filter(u => u.username.toLowerCase().includes(userSearch.toLowerCase()) || u.full_name.toLowerCase().includes(userSearch.toLowerCase())).map((u) => (
                       <tr key={u.id}>
-                        <td style={{ fontWeight: 600, color: '#60a5fa' }}>{u.username}</td>
+                        <td style={{ fontWeight: 600, color: 'var(--accent)' }}>{u.username}</td>
                         <td style={{ fontWeight: 500 }}>{u.full_name}</td>
                         <td style={{ color: 'var(--text-muted)' }}>{u.phone || '-'}</td>
                         <td><span className="badge badge-blue">{u.role ? u.role.name : u.role_id}</span></td>
