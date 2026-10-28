@@ -4,7 +4,8 @@ import {
   Users, Package, Settings, ShieldCheck, History, LogOut, 
   HelpCircle, Plus, Search, FileSpreadsheet, Download, 
   CheckCircle2, AlertTriangle, Power, Edit3, ArrowRight, Activity,
-  Smartphone, BarChart3, AlertOctagon, RefreshCw, PhoneCall, Truck
+  Smartphone, BarChart3, AlertOctagon, RefreshCw, PhoneCall, Truck,
+  ShieldAlert, UserPlus, X, Clock, Check
 } from 'lucide-react';
 import HelpModal from '../components/HelpModal';
 import ImportExcelModal from '../components/ImportExcelModal';
@@ -28,6 +29,18 @@ export default function AppHome() {
   const [password, setPassword] = useState('Admin@123456');
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // Chế độ Auth & Form đăng ký tài khoản tự do
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [regFullName, setRegFullName] = useState('');
+  const [regUsername, setRegUsername] = useState('');
+  const [regPhone, setRegPhone] = useState('');
+  const [regRoleId, setRegRoleId] = useState<number>(3); // Mặc định: Nhân viên Kinh doanh
+  const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [regError, setRegError] = useState<string | null>(null);
+  const [regSuccessMessage, setRegSuccessMessage] = useState<string | null>(null);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   // Tabs
   const [activeTab, setActiveTab] = useState<
@@ -293,17 +306,129 @@ export default function AppHome() {
     }
   };
 
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRegError(null);
+    setRegSuccessMessage(null);
+
+    if (regPassword !== regConfirmPassword) {
+      setRegError('Mật khẩu và xác nhận mật khẩu không khớp nhau.');
+      return;
+    }
+
+    if (regPassword.length < 6) {
+      setRegError('Mật khẩu phải có độ dài tối thiểu từ 6 ký tự.');
+      return;
+    }
+
+    setIsRegistering(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: regFullName,
+          username: regUsername,
+          phone: regPhone,
+          role_id: regRoleId,
+          password: regPassword
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || 'Không thể gửi yêu cầu đăng ký.');
+      }
+
+      setRegSuccessMessage(data.message || 'Đăng ký thành công! Tài khoản đang chờ Quản trị viên (Admin) xét duyệt.');
+      setRegFullName('');
+      setRegUsername('');
+      setRegPhone('');
+      setRegPassword('');
+      setRegConfirmPassword('');
+    } catch (err: any) {
+      setRegError(err.message || 'Lỗi khi gửi yêu cầu đăng ký.');
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  const handleApproveUser = async (user: any) => {
+    if (!confirm(`Phê duyệt và kích hoạt tài khoản "${user.username}" (${user.full_name}) với vai trò "${user.role?.name || 'Thành viên'}"?`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/users/${user.id}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ role_id: user.role_id })
+      });
+      if (res.ok) {
+        alert(`Đã phê duyệt tài khoản "${user.username}" thành công! Người dùng có thể đăng nhập ngay.`);
+        loadUsers();
+      } else {
+        const err = await res.json();
+        alert(err.detail || 'Lỗi khi duyệt tài khoản.');
+      }
+    } catch (err) {
+      alert('Lỗi kết nối khi phê duyệt tài khoản.');
+    }
+  };
+
+  const handleRejectUser = async (user: any) => {
+    if (!confirm(`Từ chối yêu cầu đăng ký của tài khoản "${user.username}" (${user.full_name})?`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/users/${user.id}/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        alert(`Đã từ chối tài khoản "${user.username}".`);
+        loadUsers();
+      } else {
+        const err = await res.json();
+        alert(err.detail || 'Lỗi khi từ chối tài khoản.');
+      }
+    } catch (err) {
+      alert('Lỗi kết nối khi từ chối tài khoản.');
+    }
+  };
+
+  const handleDeleteUser = async (user: any) => {
+    if (!confirm(`Xóa vĩnh viễn tài khoản "${user.username}" khỏi hệ thống?`)) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/users/${user.id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        alert(`Đã xóa tài khoản "${user.username}".`);
+        loadUsers();
+      } else {
+        alert('Không thể xóa tài khoản.');
+      }
+    } catch (err) {
+      alert('Lỗi kết nối khi xóa tài khoản.');
+    }
+  };
+
   const formatVND = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
 
-  // Màn hình Đăng nhập
+  // Màn hình Đăng nhập / Đăng ký
   if (!token) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div className="card-glass" style={{ width: '100%', maxWidth: '440px', padding: '40px 32px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <div style={{ display: 'inline-flex', padding: '12px', background: 'rgba(59, 130, 246, 0.15)', borderRadius: '16px', color: 'var(--accent)', marginBottom: '14px' }}>
+        <div className="card-glass" style={{ width: '100%', maxWidth: authMode === 'register' ? '480px' : '440px', padding: '36px 30px', transition: 'max-width 0.2s ease' }}>
+          <div style={{ textAlign: 'center', marginBottom: '22px' }}>
+            <div style={{ display: 'inline-flex', padding: '12px', background: 'rgba(59, 130, 246, 0.15)', borderRadius: '16px', color: 'var(--accent)', marginBottom: '12px' }}>
               <ShieldCheck size={36} />
             </div>
             <h1 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-main)' }}>
@@ -314,47 +439,217 @@ export default function AppHome() {
             </p>
           </div>
 
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {loginError && (
-              <div style={{ background: 'rgba(244, 63, 94, 0.12)', border: '1px solid rgba(244, 63, 94, 0.3)', padding: '10px 14px', borderRadius: '10px', color: 'var(--negative)', fontSize: '0.85rem' }}>
-                {loginError}
-              </div>
-            )}
-
-            <div>
-              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Tên đăng nhập</label>
-              <input className="form-input" value={username} onChange={(e) => setUsername(e.target.value)} required />
-            </div>
-
-            <div>
-              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Mật khẩu</label>
-              <input className="form-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            </div>
-
-            <button type="submit" className="btn-primary" style={{ justifyContent: 'center', marginTop: '8px' }} disabled={isLoggingIn}>
-              {isLoggingIn ? 'Đang xác thực...' : 'Đăng nhập vào Hệ thống'} <ArrowRight size={16} />
+          {/* Tab Switcher: Đăng nhập vs Đăng ký */}
+          <div style={{ display: 'flex', background: 'var(--raised)', padding: '3px', borderRadius: 'var(--radius-control)', border: '1px solid var(--border)', marginBottom: '20px' }}>
+            <button
+              type="button"
+              onClick={() => { setAuthMode('login'); setLoginError(null); setRegError(null); }}
+              className={authMode === 'login' ? 'btn-primary' : 'btn-secondary'}
+              style={{ flex: 1, justifyContent: 'center', fontSize: '0.8rem', padding: '6px 12px', border: 'none', background: authMode === 'login' ? undefined : 'transparent' }}
+            >
+              Đăng nhập
             </button>
-          </form>
-
-          <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--border-subtle)' }}>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textAlign: 'center', marginBottom: '10px' }}>
-              Đăng nhập nhanh các vai trò:
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'admin', 'Admin@123456')}>
-                Quản trị (admin)
-              </button>
-              <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'director', 'Director@123456')}>
-                Giám đốc (director)
-              </button>
-              <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'totruong', 'Foreman@123456')}>
-                Tổ trưởng (totruong)
-              </button>
-              <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'kinhdoanh', 'Sales@123456')}>
-                Kinh doanh (kinhdoanh)
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => { setAuthMode('register'); setLoginError(null); setRegError(null); }}
+              className={authMode === 'register' ? 'btn-primary' : 'btn-secondary'}
+              style={{ flex: 1, justifyContent: 'center', fontSize: '0.8rem', padding: '6px 12px', border: 'none', background: authMode === 'register' ? undefined : 'transparent' }}
+            >
+              Đăng ký chức vụ
+            </button>
           </div>
+
+          {/* CHẾ ĐỘ 1: ĐĂNG NHẬP */}
+          {authMode === 'login' && (
+            <div>
+              <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {loginError && (
+                  <div style={{ background: 'rgba(244, 63, 94, 0.12)', border: '1px solid rgba(244, 63, 94, 0.3)', padding: '10px 14px', borderRadius: '10px', color: 'var(--negative)', fontSize: '0.85rem' }}>
+                    {loginError}
+                  </div>
+                )}
+
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Tên đăng nhập</label>
+                  <input className="form-input" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Mật khẩu</label>
+                  <input className="form-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                </div>
+
+                <button type="submit" className="btn-primary" style={{ justifyContent: 'center', marginTop: '6px' }} disabled={isLoggingIn}>
+                  {isLoggingIn ? 'Đang xác thực...' : 'Đăng nhập vào Hệ thống'} <ArrowRight size={16} />
+                </button>
+              </form>
+
+              <p style={{ fontSize: '0.75rem', textAlign: 'center', marginTop: '14px', color: 'var(--text-muted)' }}>
+                Chưa có tài khoản?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('register'); setLoginError(null); setRegError(null); }}
+                  style={{ background: 'none', border: 'none', color: 'var(--accent)', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+                >
+                  Đăng ký chức vụ ngay
+                </button>
+              </p>
+
+              <div style={{ marginTop: '24px', paddingTop: '18px', borderTop: '1px solid var(--border-subtle)' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textAlign: 'center', marginBottom: '10px' }}>
+                  Đăng nhập nhanh các vai trò mẫu:
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'admin', 'Admin@123456')}>
+                    Quản trị (admin)
+                  </button>
+                  <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'director', 'Director@123456')}>
+                    Giám đốc (director)
+                  </button>
+                  <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'totruong', 'Foreman@123456')}>
+                    Tổ trưởng (totruong)
+                  </button>
+                  <button type="button" className="btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 10px', justifyContent: 'center' }} onClick={() => handleLogin(undefined, 'kinhdoanh', 'Sales@123456')}>
+                    Kinh doanh (kinhdoanh)
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* CHẾ ĐỘ 2: ĐĂNG KÝ TỰ DO (CHỌN CHỨC VỤ RIÊNG -> ADMIN DUYỆT) */}
+          {authMode === 'register' && (
+            <div>
+              {regSuccessMessage ? (
+                <div style={{ background: 'var(--pill-positive-bg)', border: '1px solid var(--positive)', padding: '16px', borderRadius: 'var(--radius-card)', color: 'var(--pill-positive-ink)', fontSize: '0.85rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, marginBottom: '6px' }}>
+                    <CheckCircle2 size={18} /> Gửi yêu cầu đăng ký thành công!
+                  </div>
+                  <p style={{ fontSize: '0.8rem', lineHeight: 1.5 }}>{regSuccessMessage}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '8px' }}>
+                    Quản trị viên (Admin) sẽ nhận được thông báo để kiểm tra và phê duyệt quyền truy cập cho bạn.
+                  </p>
+                  <button 
+                    type="button" 
+                    onClick={() => { setAuthMode('login'); setRegSuccessMessage(null); }}
+                    className="btn-primary" 
+                    style={{ marginTop: '14px', fontSize: '0.8rem', padding: '8px 16px', width: '100%', justifyContent: 'center' }}
+                  >
+                    Về màn hình Đăng nhập
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {regError && (
+                    <div style={{ background: 'rgba(244, 63, 94, 0.12)', border: '1px solid rgba(244, 63, 94, 0.3)', padding: '10px 14px', borderRadius: '10px', color: 'var(--negative)', fontSize: '0.8rem' }}>
+                      {regError}
+                    </div>
+                  )}
+
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Họ và tên *</label>
+                    <input 
+                      className="form-input" 
+                      placeholder="Ví dụ: Nguyễn Văn Hưng"
+                      value={regFullName} 
+                      onChange={(e) => setRegFullName(e.target.value)} 
+                      required 
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Tên đăng nhập *</label>
+                      <input 
+                        className="form-input" 
+                        placeholder="vanhung"
+                        value={regUsername} 
+                        onChange={(e) => setRegUsername(e.target.value)} 
+                        required 
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Số điện thoại</label>
+                      <input 
+                        className="form-input" 
+                        placeholder="0912..."
+                        value={regPhone} 
+                        onChange={(e) => setRegPhone(e.target.value)} 
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Chức vụ xin gia nhập *</label>
+                    <select 
+                      className="form-input"
+                      value={regRoleId} 
+                      onChange={(e) => setRegRoleId(Number(e.target.value))}
+                      style={{ fontWeight: 600 }}
+                    >
+                      <option value={2}>Giám đốc / Ban điều hành (DIRECTOR)</option>
+                      <option value={3}>Nhân viên Kinh doanh & Dự án (SALES)</option>
+                      <option value={4}>Kỹ thuật / Điều hành sản xuất (TECH)</option>
+                      <option value={5}>Quản đốc / Tổ trưởng xưởng (FOREMAN)</option>
+                      <option value={6}>Thủ kho (WAREHOUSE)</option>
+                      <option value={7}>Điều phối / Thi công lắp đặt (SITE)</option>
+                      <option value={8}>Kế toán quyết toán (ACCOUNTANT)</option>
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Mật khẩu *</label>
+                      <input 
+                        className="form-input" 
+                        type="password" 
+                        placeholder="Tối thiểu 6 ký tự"
+                        value={regPassword} 
+                        onChange={(e) => setRegPassword(e.target.value)} 
+                        required 
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Nhập lại mật khẩu *</label>
+                      <input 
+                        className="form-input" 
+                        type="password" 
+                        placeholder="Xác nhận"
+                        value={regConfirmPassword} 
+                        onChange={(e) => setRegConfirmPassword(e.target.value)} 
+                        required 
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'var(--raised)', padding: '10px', borderRadius: 'var(--radius-control)', border: '1px dashed var(--border)', fontSize: '0.7rem', color: 'var(--muted)', lineHeight: 1.4 }}>
+                    Hồ sơ sau khi gửi sẽ ở trạng thái <b>Chờ Admin duyệt</b>. Sau khi Quản trị viên kích hoạt, bạn mới có thể đăng nhập.
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="btn-primary" 
+                    style={{ justifyContent: 'center', marginTop: '4px' }} 
+                    disabled={isRegistering}
+                  >
+                    {isRegistering ? 'Đang gửi hồ sơ...' : 'Gửi Yêu Cầu Đăng Ký'} <ArrowRight size={16} />
+                  </button>
+
+                  <p style={{ fontSize: '0.75rem', textAlign: 'center', marginTop: '8px', color: 'var(--text-muted)' }}>
+                    Đã có tài khoản?{' '}
+                    <button
+                      type="button"
+                      onClick={() => { setAuthMode('login'); setRegError(null); }}
+                      style={{ background: 'none', border: 'none', color: 'var(--accent)', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+                    >
+                      Đăng nhập ngay
+                    </button>
+                  </p>
+                </form>
+              )}
+            </div>
+          )}
+
         </div>
       </div>
     );
@@ -399,6 +694,27 @@ export default function AppHome() {
             </div>
             <span className="pill neutral">{currentUser.role_code}</span>
           </div>
+
+          {/* Badge thông báo yêu cầu đăng ký chờ duyệt cho Admin */}
+          {(currentUser?.role_code === 'ADMIN' || currentUser?.role?.code === 'ADMIN') && users.some(u => u.approval_status === 'PENDING') && (
+            <button
+              onClick={() => setActiveTab('users')}
+              className="btn-secondary"
+              style={{
+                padding: '4px 10px',
+                fontSize: '0.75rem',
+                borderColor: 'var(--warning)',
+                color: 'var(--warning)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+              title="Có tài khoản tự đăng ký mới chờ Admin phê duyệt"
+            >
+              <ShieldAlert size={14} />
+              <span>{users.filter(u => u.approval_status === 'PENDING').length} chờ duyệt</span>
+            </button>
+          )}
 
           <button className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.75rem' }} onClick={() => setIsHelpOpen(true)}>
             <HelpCircle size={15} /> <b>?</b> Hướng dẫn
@@ -495,8 +811,15 @@ export default function AppHome() {
             <History size={16} /> Nhật ký Đối soát AI
           </button>
 
-          <button onClick={() => setActiveTab('users')} className={activeTab === 'users' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'flex-start', border: activeTab === 'users' ? 'none' : '1px solid transparent', background: activeTab === 'users' ? undefined : 'transparent' }}>
-            <Users size={16} /> Quản lý Người dùng
+          <button onClick={() => setActiveTab('users')} className={activeTab === 'users' ? 'btn-primary' : 'btn-secondary'} style={{ width: '100%', justifyContent: 'space-between', border: activeTab === 'users' ? 'none' : '1px solid transparent', background: activeTab === 'users' ? undefined : 'transparent' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Users size={16} /> Quản lý Người dùng
+            </span>
+            {users.some(u => u.approval_status === 'PENDING') && (
+              <span className="pill warn" style={{ fontSize: '0.65rem', padding: '1px 5px' }}>
+                {users.filter(u => u.approval_status === 'PENDING').length}
+              </span>
+            )}
           </button>
         </aside>
 
@@ -1128,57 +1451,198 @@ export default function AppHome() {
           )}
 
           {/* TAB: NGƯỜI DÙNG */}
-          {activeTab === 'users' && (
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <div>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Danh sách Nhân sự & Phân quyền Vai trò</h2>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Cấp quyền theo 8 vai trò nghiệp vụ chuỗi sản xuất</p>
-                </div>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <input className="form-input" style={{ width: '240px' }} placeholder="Tìm nhân sự..." value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
-                  <button className="btn-primary" onClick={() => setIsAddUserOpen(true)}>
-                    <Plus size={16} /> Thêm người dùng
-                  </button>
-                </div>
-              </div>
+          {activeTab === 'users' && (() => {
+            const pendingUsers = users.filter(u => u.approval_status === 'PENDING' || (!u.is_active && u.approval_status !== 'REJECTED' && u.username !== 'admin'));
+            const activeUsers = users.filter(u => u.approval_status !== 'PENDING' && !pendingUsers.some(p => p.id === u.id));
+            const filteredActive = activeUsers.filter(u => (u.username || '').toLowerCase().includes(userSearch.toLowerCase()) || (u.full_name || '').toLowerCase().includes(userSearch.toLowerCase()));
 
-              <div className="data-table-container">
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Tên đăng nhập</th>
-                      <th>Họ và tên</th>
-                      <th>Số điện thoại</th>
-                      <th>Vai trò</th>
-                      <th>Trạng thái</th>
-                      <th style={{ textAlign: 'right' }}>Thao tác</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.filter(u => u.username.toLowerCase().includes(userSearch.toLowerCase()) || u.full_name.toLowerCase().includes(userSearch.toLowerCase())).map((u) => (
-                      <tr key={u.id}>
-                        <td style={{ fontWeight: 600, color: 'var(--accent)' }}>{u.username}</td>
-                        <td style={{ fontWeight: 500 }}>{u.full_name}</td>
-                        <td style={{ color: 'var(--text-muted)' }}>{u.phone || '-'}</td>
-                        <td><span className="badge badge-blue">{u.role ? u.role.name : u.role_id}</span></td>
-                        <td>
-                          {u.is_active ? <span className="badge badge-green">Đang hoạt động</span> : <span className="badge badge-red">Đã khóa</span>}
-                        </td>
-                        <td style={{ textAlign: 'right' }}>
-                          {u.username !== 'admin' && (
-                            <button className={u.is_active ? 'btn-danger' : 'btn-secondary'} onClick={() => handleToggleUserStatus(u)} style={{ padding: '6px 12px' }}>
-                              {u.is_active ? 'Khóa' : 'Kích hoạt'}
-                            </button>
-                          )}
-                        </td>
+            return (
+              <div>
+                {/* Header Tab */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                  <div>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Users size={22} style={{ color: 'var(--accent)' }} /> Quản trị Nhân sự & Phê duyệt Đăng ký
+                    </h2>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      Mỗi nhân sự tự đăng ký theo chức vụ riêng • Admin xét duyệt và kích hoạt quyền truy cập
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="btn-secondary" onClick={loadUsers} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
+                      <RefreshCw size={13} /> Làm mới
+                    </button>
+                    <button className="btn-primary" onClick={() => setIsAddUserOpen(true)} style={{ padding: '6px 14px', fontSize: '0.75rem' }}>
+                      <Plus size={15} /> Thêm nhân sự trực tiếp
+                    </button>
+                  </div>
+                </div>
+
+                {/* KHỐI 1: YÊU CẦU ĐĂNG KÝ CHỜ ADMIN DUYỆT (ƯU TIÊN HÀNG ĐẦU) */}
+                <div className="card" style={{ padding: '20px', marginBottom: '28px', borderLeft: pendingUsers.length > 0 ? '4px solid var(--warning)' : '1px solid var(--border)', background: 'var(--surface)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <ShieldAlert size={20} style={{ color: pendingUsers.length > 0 ? 'var(--warning)' : 'var(--muted)' }} />
+                      <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Yêu Cầu Tự Đăng Ký Chờ Xét Duyệt</h3>
+                      <span className={pendingUsers.length > 0 ? 'pill warn' : 'pill neutral'} style={{ fontSize: '0.7rem' }}>
+                        {pendingUsers.length} tài khoản chờ duyệt
+                      </span>
+                    </div>
+                  </div>
+
+                  {pendingUsers.length === 0 ? (
+                    <div style={{ padding: '20px', textAlign: 'center', background: 'var(--raised)', borderRadius: 'var(--radius-control)', border: '1px dashed var(--border)' }}>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
+                        Hiện không có yêu cầu đăng ký nào đang chờ duyệt. Khi có nhân sự mới tự đăng ký ngoài màn hình đăng nhập, hồ sơ sẽ lập tức hiển thị tại đây để bạn bấm duyệt.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="data-table-container">
+                      <table className="data-table">
+                        <thead>
+                          <tr>
+                            <th>Tên đăng nhập</th>
+                            <th>Họ và tên</th>
+                            <th>Số điện thoại</th>
+                            <th>Chức vụ xin gia nhập</th>
+                            <th>Thời điểm đăng ký</th>
+                            <th style={{ textAlign: 'right' }}>Quyết định của Admin</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pendingUsers.map((u) => (
+                            <tr key={u.id} style={{ background: 'rgba(245, 158, 11, 0.04)' }}>
+                              <td style={{ fontWeight: 700, color: 'var(--accent)' }}>{u.username}</td>
+                              <td style={{ fontWeight: 600 }}>{u.full_name}</td>
+                              <td style={{ color: 'var(--text-muted)' }}>{u.phone || '-'}</td>
+                              <td>
+                                <select 
+                                  value={u.role_id}
+                                  onChange={(e) => {
+                                    const newRoleId = Number(e.target.value);
+                                    const r = roles.find(item => item.id === newRoleId);
+                                    u.role_id = newRoleId;
+                                    if (r) u.role = r;
+                                    setUsers([...users]);
+                                  }}
+                                  style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border)', fontSize: '0.75rem', fontWeight: 600, background: 'var(--raised)' }}
+                                  title="Admin có thể đổi chức vụ khác trước khi duyệt"
+                                >
+                                  {roles.filter(r => r.code !== 'ADMIN').map((r) => (
+                                    <option key={r.id} value={r.id}>
+                                      {r.name} ({r.code})
+                                    </option>
+                                  ))}
+                                </select>
+                              </td>
+                              <td style={{ fontSize: '0.75rem', color: 'var(--faint)' }}>
+                                {u.registered_at ? new Date(u.registered_at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }) : 'Vừa đăng ký'}
+                              </td>
+                              <td style={{ textAlign: 'right' }}>
+                                <div style={{ display: 'inline-flex', gap: '8px' }}>
+                                  <button
+                                    className="btn-primary"
+                                    style={{ padding: '6px 14px', fontSize: '0.75rem', background: 'var(--positive)', borderColor: 'var(--positive)', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                    onClick={() => handleApproveUser(u)}
+                                    title="Duyệt và cấp quyền hoạt động ngay"
+                                  >
+                                    <Check size={14} /> Duyệt & Kích hoạt
+                                  </button>
+                                  <button
+                                    className="btn-danger"
+                                    style={{ padding: '6px 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                    onClick={() => handleRejectUser(u)}
+                                    title="Từ chối yêu cầu đăng ký"
+                                  >
+                                    <X size={14} /> Từ chối
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* KHỐI 2: DANH SÁCH NHÂN SỰ ĐÃ DUYỆT & ĐANG HOẠT ĐỘNG */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Danh Sách Nhân Sự Đã Kích Hoạt ({filteredActive.length})</h3>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Tài khoản hợp lệ đang vận hành trong chuỗi sản xuất</p>
+                  </div>
+                  <input 
+                    className="form-input" 
+                    style={{ width: '260px' }} 
+                    placeholder="Tìm theo tên đăng nhập, họ tên..." 
+                    value={userSearch} 
+                    onChange={(e) => setUserSearch(e.target.value)} 
+                  />
+                </div>
+
+                <div className="data-table-container">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Tên đăng nhập</th>
+                        <th>Họ và tên</th>
+                        <th>Số điện thoại</th>
+                        <th>Chức vụ / Vai trò</th>
+                        <th>Trạng thái</th>
+                        <th style={{ textAlign: 'right' }}>Thao tác</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {filteredActive.map((u) => {
+                        const isRejected = u.approval_status === 'REJECTED';
+                        const isActive = u.is_active && !isRejected;
+
+                        return (
+                          <tr key={u.id}>
+                            <td style={{ fontWeight: 600, color: 'var(--accent)' }}>{u.username}</td>
+                            <td style={{ fontWeight: 500 }}>{u.full_name}</td>
+                            <td style={{ color: 'var(--text-muted)' }}>{u.phone || '-'}</td>
+                            <td><span className="badge badge-blue">{u.role ? u.role.name : u.role_id}</span></td>
+                            <td>
+                              {isRejected ? (
+                                <span className="pill neg" style={{ fontSize: '0.7rem' }}>Đã từ chối</span>
+                              ) : isActive ? (
+                                <span className="pill pos" style={{ fontSize: '0.7rem' }}>Đang hoạt động</span>
+                              ) : (
+                                <span className="pill warn" style={{ fontSize: '0.7rem' }}>Đã khóa</span>
+                              )}
+                            </td>
+                            <td style={{ textAlign: 'right' }}>
+                              {u.username !== 'admin' && (
+                                <div style={{ display: 'inline-flex', gap: '6px' }}>
+                                  <button 
+                                    className={isActive ? 'btn-danger' : 'btn-secondary'} 
+                                    onClick={() => handleToggleUserStatus(u)} 
+                                    style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                                  >
+                                    {isActive ? 'Khóa' : 'Mở khóa'}
+                                  </button>
+                                  <button 
+                                    className="btn-secondary" 
+                                    onClick={() => handleDeleteUser(u)} 
+                                    style={{ padding: '4px 8px', fontSize: '0.75rem', color: 'var(--negative)' }}
+                                    title="Xóa tài khoản"
+                                  >
+                                    <X size={13} />
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </main>
       </div>
 

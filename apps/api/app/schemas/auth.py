@@ -5,6 +5,13 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+    full_name: str
+    phone: Optional[str] = None
+    role_id: str
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

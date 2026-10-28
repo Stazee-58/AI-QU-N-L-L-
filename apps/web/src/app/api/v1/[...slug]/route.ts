@@ -21,15 +21,15 @@ const ROLES = [
 ];
 
 // Users
-let users = [
-  { id: 1, username: 'admin', full_name: 'Quản trị viên Hệ thống Cậu Long', phone: '0901234567', role_id: 1, is_active: true, role: ROLES[0] },
-  { id: 2, username: 'director', full_name: 'Giám đốc Nguyễn Văn An', phone: '0901000001', role_id: 2, is_active: true, role: ROLES[1] },
-  { id: 3, username: 'kinhdoanh', full_name: 'Kinh doanh Phạm Thị Dung', phone: '0901000002', role_id: 3, is_active: true, role: ROLES[2] },
-  { id: 4, username: 'kythuat', full_name: 'Kỹ sư Lê Hoàng Nam', phone: '0901000003', role_id: 4, is_active: true, role: ROLES[3] },
-  { id: 5, username: 'totruong', full_name: 'Tổ trưởng xưởng Trần Văn Bình', phone: '0901000004', role_id: 5, is_active: true, role: ROLES[4] },
-  { id: 6, username: 'thukho', full_name: 'Thủ kho Lê Văn Chung', phone: '0901000005', role_id: 6, is_active: true, role: ROLES[5] },
-  { id: 7, username: 'thicong', full_name: 'Giám sát thi công Vũ Minh Đức', phone: '0901000006', role_id: 7, is_active: true, role: ROLES[6] },
-  { id: 8, username: 'ketoan', full_name: 'Kế toán trưởng Hoàng Kim Oanh', phone: '0901000007', role_id: 8, is_active: true, role: ROLES[7] }
+let users: any[] = [
+  { id: 1, username: 'admin', full_name: 'Quản trị viên Hệ thống Cậu Long', phone: '0901234567', role_id: 1, is_active: true, approval_status: 'APPROVED', role: ROLES[0] },
+  { id: 2, username: 'director', full_name: 'Giám đốc Nguyễn Văn An', phone: '0901000001', role_id: 2, is_active: true, approval_status: 'APPROVED', role: ROLES[1] },
+  { id: 3, username: 'kinhdoanh', full_name: 'Kinh doanh Phạm Thị Dung', phone: '0901000002', role_id: 3, is_active: true, approval_status: 'APPROVED', role: ROLES[2] },
+  { id: 4, username: 'kythuat', full_name: 'Kỹ sư Lê Hoàng Nam', phone: '0901000003', role_id: 4, is_active: true, approval_status: 'APPROVED', role: ROLES[3] },
+  { id: 5, username: 'totruong', full_name: 'Tổ trưởng xưởng Trần Văn Bình', phone: '0901000004', role_id: 5, is_active: true, approval_status: 'APPROVED', role: ROLES[4] },
+  { id: 6, username: 'thukho', full_name: 'Thủ kho Lê Văn Chung', phone: '0901000005', role_id: 6, is_active: true, approval_status: 'APPROVED', role: ROLES[5] },
+  { id: 7, username: 'thicong', full_name: 'Giám sát thi công Vũ Minh Đức', phone: '0901000006', role_id: 7, is_active: true, approval_status: 'APPROVED', role: ROLES[6] },
+  { id: 8, username: 'ketoan', full_name: 'Kế toán trưởng Hoàng Kim Oanh', phone: '0901000007', role_id: 8, is_active: true, approval_status: 'APPROVED', role: ROLES[7] }
 ];
 
 // Demo Materials Catalog
@@ -959,18 +959,97 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     return NextResponse.json(newWo, { status: 201 });
   }
 
-  // 1. Auth login
+  // 1a. Auth register (Mỗi người tự đăng ký với chức vụ riêng -> Chờ Admin duyệt)
+  if (path === 'auth/register') {
+    const { username, full_name, phone, role_id } = body;
+    if (!username || !full_name) {
+      return NextResponse.json({ detail: 'Vui lòng điền đầy đủ Họ và tên và Tên đăng nhập.' }, { status: 400 });
+    }
+    const cleanUsername = username.trim().toLowerCase();
+    const existing = users.find(u => u.username.toLowerCase() === cleanUsername);
+    if (existing) {
+      return NextResponse.json({ detail: `Tên đăng nhập '${cleanUsername}' đã được sử dụng. Vui lòng chọn tên khác.` }, { status: 400 });
+    }
+    const targetRoleId = Number(role_id) || 3;
+    // Không cho tự đăng ký quyền ADMIN
+    const role = ROLES.find(r => r.id === targetRoleId && r.code !== 'ADMIN') || ROLES[2];
+    const newUser = {
+      id: users.length + 1,
+      username: cleanUsername,
+      full_name: full_name.trim(),
+      phone: phone ? phone.trim() : '',
+      role_id: role.id,
+      is_active: false,
+      approval_status: 'PENDING',
+      registered_at: new Date().toISOString(),
+      role
+    };
+    users.push(newUser);
+    return NextResponse.json({
+      message: `Đăng ký thành công! Tài khoản '${cleanUsername}' với chức vụ '${role.name}' đang chờ Quản trị viên (Admin) xét duyệt.`,
+      user: newUser
+    }, { status: 201 });
+  }
+
+  // 1b. Auth login
   if (path === 'auth/login') {
     const { username } = body;
-    const user = users.find(u => u.username.toLowerCase() === (username || '').toLowerCase()) || users[0];
+    const cleanUser = (username || '').toLowerCase().trim();
+    const user = users.find(u => u.username.toLowerCase() === cleanUser);
+    if (!user) {
+      return NextResponse.json({ detail: 'Tên đăng nhập không tồn tại trên hệ thống.' }, { status: 401 });
+    }
+    if (user.approval_status === 'PENDING') {
+      return NextResponse.json({ 
+        detail: 'Tài khoản của bạn đang ở trạng thái CHỜ DUYỆT từ Quản trị viên (Admin). Vui lòng đợi Admin kích hoạt.' 
+      }, { status: 403 });
+    }
+    if (user.approval_status === 'REJECTED' || user.is_active === false) {
+      return NextResponse.json({ 
+        detail: 'Tài khoản này đã bị khóa hoặc từ chối kích hoạt. Vui lòng liên hệ Quản trị viên.' 
+      }, { status: 403 });
+    }
     return NextResponse.json({
       access_token: `token-cau-long-${user.username}-${Date.now()}`,
       token_type: 'bearer',
       id: user.id,
       username: user.username,
       full_name: user.full_name,
+      role_code: user.role?.code,
+      role_name: user.role?.name,
       role: user.role
     });
+  }
+
+  // 1c. Approve User (Admin duyệt)
+  if (slug[0] === 'users' && slug[2] === 'approve') {
+    const uid = Number(slug[1]);
+    const u = users.find(it => it.id === uid);
+    if (u) {
+      u.is_active = true;
+      u.approval_status = 'APPROVED';
+      if (body.role_id) {
+        const r = ROLES.find(item => item.id === Number(body.role_id));
+        if (r) {
+          u.role_id = r.id;
+          u.role = r;
+        }
+      }
+      return NextResponse.json({ message: `Đã phê duyệt và kích hoạt tài khoản '${u.username}' thành công!`, user: u });
+    }
+    return NextResponse.json({ detail: 'Không tìm thấy người dùng' }, { status: 404 });
+  }
+
+  // 1d. Reject User (Admin từ chối)
+  if (slug[0] === 'users' && slug[2] === 'reject') {
+    const uid = Number(slug[1]);
+    const u = users.find(it => it.id === uid);
+    if (u) {
+      u.is_active = false;
+      u.approval_status = 'REJECTED';
+      return NextResponse.json({ message: `Đã từ chối yêu cầu đăng ký của '${u.username}'`, user: u });
+    }
+    return NextResponse.json({ detail: 'Không tìm thấy người dùng' }, { status: 404 });
   }
 
   // 2. Add User
@@ -983,6 +1062,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
       phone: body.phone,
       role_id: role.id,
       is_active: true,
+      approval_status: 'APPROVED',
       role
     };
     users.push(newUser);
@@ -1329,6 +1409,14 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
     const u = users.find(it => it.id === uid);
     if (u) {
       if (body.is_active !== undefined) u.is_active = body.is_active;
+      if (body.approval_status !== undefined) u.approval_status = body.approval_status;
+      if (body.role_id !== undefined) {
+        const r = ROLES.find(item => item.id === Number(body.role_id));
+        if (r) {
+          u.role_id = r.id;
+          u.role = r;
+        }
+      }
       return NextResponse.json(u);
     }
   }

@@ -144,6 +144,26 @@ Mật khẩu chung cho tất cả tài khoản mẫu: `Admin@123456` (hoặc b�
 | 8  | ketoan      | Kế toán trưởng & Quyết toán        | Đối chiếu chi phí thực vs dự toán, MISA   |
 +----+-------------+------------------------------------+-------------------------------------------+
 
+--------------------------------------------------------------------------------
+TỰ ĐĂNG KÝ TÀI KHOẢN VÀ QUY TRÌNH ADMIN PHÊ DUYỆT (MỚI BỔ SUNG):
+--------------------------------------------------------------------------------
+Hệ thống cho phép bất kỳ nhân sự nào cũng có thể tự tạo tài khoản:
+1. Bước 1 (Nhân sự tự đăng ký):
+   - Tại màn hình đăng nhập, chuyển sang tab "Đăng ký chức vụ".
+   - Điền Họ tên, Tên đăng nhập, Số điện thoại, Mật khẩu.
+   - Chọn Chức vụ / Vai trò mong muốn trong danh sách (Giám đốc, Kinh doanh, Kỹ thuật,
+     Tổ trưởng, Thủ kho, Thi công, Kế toán).
+   - Bấm "Gửi Yêu Cầu Đăng Ký". Tài khoản lập tức được tạo ở trạng thái CHỜ DUYỆT (Pending).
+   - Nếu đăng nhập lúc này, hệ thống sẽ thông báo: "Tài khoản đang chờ Admin xét duyệt".
+
+2. Bước 2 (Quản trị viên xét duyệt):
+   - Admin đăng nhập bằng tài khoản `admin` -> Chọn tab "Quản lý Người dùng".
+   - Ngay trên đầu trang sẽ có khối: "Yêu Cầu Tự Đăng Ký Chờ Xét Duyệt" kèm số lượng chờ duyệt.
+   - Admin kiểm tra hồ sơ, có thể đổi chức vụ khác nếu thấy cần thiết.
+   - Bấm nút xanh "Duyệt & Kích hoạt": Tài khoản chuyển sang trạng thái "Đang hoạt động".
+   - Nhân sự lập tức có thể đăng nhập và sử dụng hệ thống đúng phân quyền vai trò của mình.
+   - Nếu không phù hợp, Admin bấm nút đỏ "Từ chối" hoặc "Xóa".
+
 
 ================================================================================
 PHẦN 4: CHI TIẾT CÁC TÍNH NĂNG VÀ CÁCH DÙNG TỪNG PHÂN HỆ
